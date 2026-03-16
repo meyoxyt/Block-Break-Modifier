@@ -1,9 +1,10 @@
 package com.blockbreakmodifier.mixin;
 
 import com.blockbreakmodifier.client.BlockBreakModifierClient;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.world.SelectWorldScreen;
 import net.minecraft.client.gui.screen.world.WorldListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
@@ -15,43 +16,65 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import net.minecraft.client.gui.Click;
 
+@Environment(EnvType.CLIENT)
 @Mixin(WorldListWidget.WorldEntry.class)
 public abstract class WorldListEntryMixin {
 
-    @Shadow @Final private LevelSummary level;
-    @Shadow @Final private SelectWorldScreen screen;
+    @Shadow
+    @Final
+    LevelSummary level;
 
     @Unique
     private ButtonWidget blockbreakmodifier$reloadButton;
 
     @Inject(
             method = "render",
-            at = @At("HEAD")
+            at = @At("TAIL")
     )
     private void blockbreakmodifier$renderReloadButton(
-            DrawContext context, int index, int y, int x, int entryWidth, int entryHeight,
-            int mouseX, int mouseY, boolean hovered, float tickDelta, CallbackInfo ci
+            DrawContext context,
+            int mouseX,
+            int mouseY,
+            boolean hovered,
+            float deltaTicks,
+            CallbackInfo ci
     ) {
+        if (!hovered) return;
+
+        int entryX = this.getX();
+        int entryY = this.getY();
+        int entryWidth = this.getWidth();
+        int entryHeight = this.getHeight();
+
         if (blockbreakmodifier$reloadButton == null) {
             String worldId = level.getName();
             blockbreakmodifier$reloadButton = ButtonWidget.builder(
                     Text.literal("\u21BB BBM"),
                     btn -> {
                         BlockBreakModifierClient.reloadForWorld(worldId);
-                        MinecraftClient.getInstance().player.sendMessage(
-                                Text.literal("§a[BlockBreakModifier] Config reloaded for world: §e" + worldId), false
-                        );
+                        MinecraftClient mc = MinecraftClient.getInstance();
+                        if (mc.player != null) {
+                            mc.player.sendMessage(
+                                    Text.literal("§a[BBM] §7Reloaded config for world: §e" + worldId),
+                                    false
+                            );
+                        }
                     }
-            ).dimensions(x + entryWidth - 58, y + entryHeight - 18, 56, 16).build();
+            ).dimensions(
+                    entryX + entryWidth - 60,
+                    entryY + entryHeight - 20,
+                    58,
+                    18
+            ).build();
         } else {
-            blockbreakmodifier$reloadButton.setX(x + entryWidth - 58);
-            blockbreakmodifier$reloadButton.setY(y + entryHeight - 18);
+            blockbreakmodifier$reloadButton.setX(entryX + entryWidth - 60);
+            blockbreakmodifier$reloadButton.setY(entryY + entryHeight - 20);
         }
 
-        if (hovered) {
-            blockbreakmodifier$reloadButton.render(context, mouseX, mouseY, tickDelta);
-        }
+        blockbreakmodifier$reloadButton.render(context, mouseX, mouseY, deltaTicks);
     }
 
     @Inject(
@@ -60,10 +83,27 @@ public abstract class WorldListEntryMixin {
             cancellable = true
     )
     private void blockbreakmodifier$handleReloadClick(
-            double mouseX, double mouseY, int button, CallbackInfo ci
+            Click click,
+            boolean doubled,
+            CallbackInfoReturnable<Boolean> cir
     ) {
-        if (blockbreakmodifier$reloadButton != null && blockbreakmodifier$reloadButton.mouseClicked(mouseX, mouseY, button)) {
-            ci.cancel();
+        if (blockbreakmodifier$reloadButton != null
+                && blockbreakmodifier$reloadButton.mouseClicked(
+                        click.posX(), click.posY(), click.button()
+                )) {
+            cir.setReturnValue(true);
         }
     }
+
+    @Shadow
+    public abstract int getX();
+
+    @Shadow
+    public abstract int getY();
+
+    @Shadow
+    public abstract int getWidth();
+
+    @Shadow
+    public abstract int getHeight();
 }

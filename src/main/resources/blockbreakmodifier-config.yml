@@ -5,79 +5,120 @@
 #
 #  WHAT IS THIS FILE?
 #  ------------------
-#  This is the GLOBAL config. Changes here apply to ALL singleplayer worlds
-#  and to servers. If a world also has its own config folder, the global config
-#  OVERRIDES any conflicting block entries in the per-world config.
+#  This is the GLOBAL config. Entries here apply to ALL singleplayer worlds
+#  AND to dedicated servers. If the same block is also configured in a world's
+#  own config, the GLOBAL entry wins and overrides it.
 #
-#  FILE LOCATION
-#  -------------
+#  WHERE ARE ALL CONFIG FILES?
+#  ---------------------------
 #  Global config (this file):
-#    config/blockbreakmodifier/blockbreakmodifier-config.yml
+#    .minecraft/config/blockbreakmodifier/blockbreakmodifier-config.yml
 #
-#  Per-world config (auto-created on world join):
-#    config/blockbreakmodifier/<WorldFolderName>/blockbreakmodifier-config.yml
+#  Per-world configs (auto-created the first time you join each world):
+#    .minecraft/config/blockbreakmodifier/<WorldFolderName>/blockbreakmodifier-config.yml
 #
 #  CONFIG PRIORITY
 #  ---------------
-#  Per-world config is loaded first, then the global config is merged ON TOP.
-#  If the same block is defined in both, the GLOBAL definition wins.
-#
-#  HOW TO USE THIS FILE
-#  --------------------
-#  1. Find the block ID you want to change (e.g. minecraft:obsidian)
-#  2. Replace the ":" with "." in the ID (YAML limitation)
-#     minecraft:obsidian  ->  minecraft.obsidian
-#  3. Add it under "blocks:" with your desired tools and speeds
-#  4. Use the in-game Reload button (world list screen, hover a world) OR
-#     restart the game to apply changes.
-#
-#  BREAKING SPEED GUIDE
-#  --------------------
-#  Higher number = faster break. Values are floats.
-#  Reference speeds:
-#    1.0    = bare hand on dirt
-#    4.0    = wooden pickaxe on stone
-#    8.0    = diamond pickaxe on stone
-#    30.0   = very fast
-#    50.0   = near-instant
-#    100.0  = instant
-#
-#  BLAST RESISTANCE GUIDE
-#  ----------------------
-#  Controls how resistant the block is to explosions.
-#  blast-resistance is OPTIONAL. Remove the line to leave it vanilla.
-#  Vanilla values:
-#    Dirt          :     0.5
-#    Stone         :     6.0
-#    Obsidian      :  1200.0
-#    Ancient Debris:  1200.0
-#    Bedrock       :  3600000.0
-#  Set to 0.0 to make a block fully destroyable by TNT.
-#
-#  TOOL ID REFERENCE
-#  -----------------
-#  minecraft.wooden_pickaxe    minecraft.stone_pickaxe
-#  minecraft.iron_pickaxe      minecraft.golden_pickaxe
-#  minecraft.diamond_pickaxe   minecraft.netherite_pickaxe
-#  minecraft.wooden_shovel     minecraft.stone_shovel
-#  minecraft.wooden_axe        minecraft.stone_axe
-#  minecraft.shears
-#  minecraft.air               <- empty hand (no item held)
-#  <modid>.<tool_name>         <- any modded tool
-#
-#  FULL STRUCTURE REFERENCE
-#  ------------------------
-#  blocks:
-#    <namespace>.<block_name>:
-#      blast-resistance: <float>          # optional
-#      breaking-tools:
-#        <namespace>.<tool_name>: <speed> # one line per tool
+#  Both configs are loaded and merged. Global always overrides world-specific
+#  entries for the same block. Use the global config for changes you want
+#  everywhere, and per-world configs for world-specific tweaks.
 #
 # =============================================================================
+#  QUICK START GUIDE
+# =============================================================================
 #
-#  EXAMPLES  (commented out - uncomment and edit to activate)
+#  STEP 1 - Find the block ID you want to change.
+#    All Minecraft block IDs follow the format:  namespace:block_name
+#    Examples:  minecraft:obsidian   minecraft:stone   minecraft:diamond_ore
+#    Modded:    somemod:custom_block
 #
-# --- Example 1: Obsidian with wooden pickaxe, near-instant ---
+#  STEP 2 - Replace ":" with "." in the ID.
+#    YAML uses colons for its own syntax, so you must replace them with dots.
+#    The mod converts them back to colons at runtime automatically.
+#    minecraft:obsidian  ->  minecraft.obsidian
+#
+#  STEP 3 - Add it under the "blocks:" section with your settings.
+#    Each block entry supports:
+#      blast-resistance: <float>         (optional - leave out to keep vanilla)
+#      breaking-tools:
+#        <tool_id>: <speed>              (one line per tool)
+#
+#  STEP 4 - Apply your changes WITHOUT restarting.
+#    - Open the Singleplayer world selection screen.
+#    - Hover your mouse over the world you want to reload for.
+#    - Click the "↻ BBM" button that appears at the bottom-right of the entry.
+#    - A chat message confirms the reload. Changes are instant.
+#    (On servers a restart is currently required.)
+#
+# =============================================================================
+#  BREAKING SPEED GUIDE
+# =============================================================================
+#
+#  The speed value is a float. Higher = faster breaking.
+#
+#  Speed   |  Feel
+#  --------|---------------------------------------------
+#  1.0     |  Bare hand on dirt (very slow)
+#  4.0     |  Wooden pickaxe on stone
+#  8.0     |  Diamond pickaxe on stone (standard fast)
+#  30.0    |  Very fast
+#  50.0    |  Near-instant
+#  100.0   |  Instant
+#
+#  Note: Efficiency enchantments still stack ON TOP of this base speed.
+#
+# =============================================================================
+#  BLAST RESISTANCE GUIDE
+# =============================================================================
+#
+#  Controls how resistant a block is to explosions (TNT, creepers, etc.).
+#  This field is OPTIONAL per block. Leave it out to keep vanilla resistance.
+#
+#  Block           |  Vanilla Value
+#  ----------------|---------------
+#  Dirt            |  0.5
+#  Stone           |  6.0
+#  Obsidian        |  1200.0
+#  Crying Obsidian |  1200.0
+#  Ancient Debris  |  1200.0
+#  Bedrock         |  3600000.0
+#
+#  Set to 0.0 to make a block fully destroyable by TNT.
+#
+# =============================================================================
+#  TOOL ID REFERENCE
+# =============================================================================
+#
+#  Replace ":" with "." in all tool IDs, same as block IDs.
+#
+#  minecraft.wooden_pickaxe     minecraft.stone_pickaxe
+#  minecraft.iron_pickaxe       minecraft.golden_pickaxe
+#  minecraft.diamond_pickaxe    minecraft.netherite_pickaxe
+#  minecraft.wooden_shovel      minecraft.stone_shovel
+#  minecraft.iron_shovel        minecraft.golden_shovel
+#  minecraft.diamond_shovel     minecraft.netherite_shovel
+#  minecraft.wooden_axe         minecraft.stone_axe
+#  minecraft.iron_axe           minecraft.golden_axe
+#  minecraft.diamond_axe        minecraft.netherite_axe
+#  minecraft.shears
+#  minecraft.air                <-- empty hand (no item held)
+#  <modid>.<tool_name>          <-- any modded tool
+#
+# =============================================================================
+#  FULL STRUCTURE REFERENCE
+# =============================================================================
+#
+#  blocks:
+#    <namespace>.<block_name>:
+#      blast-resistance: <float>             # optional
+#      breaking-tools:
+#        <namespace>.<tool_name>: <speed>    # one line per tool
+#
+# =============================================================================
+#  EXAMPLES (all commented out - uncomment and edit to activate)
+# =============================================================================
+#
+# --- Example 1: Obsidian with wooden pickaxe, near-instant, TNT-destroyable ---
 # blocks:
 #   minecraft.obsidian:
 #     blast-resistance: 10.0
@@ -93,17 +134,19 @@
 #       minecraft.golden_pickaxe: 60.0
 #
 # --- Example 3: Stone breakable with bare hands ---
+#   (minecraft.air = no item held)
 # blocks:
 #   minecraft.stone:
 #     breaking-tools:
 #       minecraft.air: 5.0
 #
-# --- Example 4: Multiple blocks at once ---
+# --- Example 4: Multiple blocks configured at once ---
 # blocks:
 #   minecraft.obsidian:
 #     blast-resistance: 10.0
 #     breaking-tools:
 #       minecraft.wooden_pickaxe: 50.0
+#       minecraft.iron_pickaxe: 100.0
 #   minecraft.crying_obsidian:
 #     blast-resistance: 10.0
 #     breaking-tools:
@@ -111,6 +154,10 @@
 #   minecraft.diamond_ore:
 #     breaking-tools:
 #       minecraft.wooden_pickaxe: 30.0
+#   minecraft.netherrack:
+#     blast-resistance: 0.0
+#     breaking-tools:
+#       minecraft.wooden_shovel: 10.0
 #
 # --- Example 5: Custom modded block ---
 # blocks:
@@ -118,6 +165,7 @@
 #     blast-resistance: 5.0
 #     breaking-tools:
 #       minecraft.golden_pickaxe: 20.0
+#       minecraft.wooden_axe: 15.0
 #
 # =============================================================================
 

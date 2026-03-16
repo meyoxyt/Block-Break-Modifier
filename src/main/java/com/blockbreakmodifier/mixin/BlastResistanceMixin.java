@@ -18,7 +18,9 @@ public abstract class BlastResistanceMixin {
             at = @At("RETURN"),
             cancellable = true
     )
-    private void blockbreakmodifier$overrideBlastResistance(CallbackInfoReturnable<Float> cir) {
+    private void blockbreakmodifier$overrideBlastResistance(
+            CallbackInfoReturnable<Float> cir
+    ) {
         AbstractBlock.AbstractBlockState self = (AbstractBlock.AbstractBlockState) (Object) this;
         Block block = self.getBlock();
         Identifier blockId = Registries.BLOCK.getId(block);

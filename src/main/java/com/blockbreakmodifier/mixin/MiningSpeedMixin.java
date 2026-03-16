@@ -25,14 +25,13 @@ public abstract class MiningSpeedMixin {
     ) {
         PlayerEntity self = (PlayerEntity) (Object) this;
         Identifier blockId = Registries.BLOCK.getId(state.getBlock());
-        String blockKey = blockId.toString();
 
-        if (!BlockBreakConfig.hasBlockOverride(blockKey)) return;
+        if (!BlockBreakConfig.hasBlockOverride(blockId.toString())) return;
 
         ItemStack held = self.getMainHandStack();
         Identifier toolId = Registries.ITEM.getId(held.getItem());
-        String toolKey = toolId.toString();
 
-        BlockBreakConfig.getToolSpeed(blockKey, toolKey).ifPresent(cir::setReturnValue);
+        BlockBreakConfig.getToolSpeed(blockId.toString(), toolId.toString())
+                .ifPresent(cir::setReturnValue);
     }
 }

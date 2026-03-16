@@ -3,9 +3,10 @@ package com.blockbreakmodifier.client;
 import com.blockbreakmodifier.BlockBreakConfig;
 import com.blockbreakmodifier.BlockBreakModifier;
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
-import net.minecraft.client.MinecraftClient;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
+@Environment(EnvType.CLIENT)
 public class BlockBreakModifierClient implements ClientModInitializer {
 
     private static String currentWorldName = null;
@@ -13,16 +14,12 @@ public class BlockBreakModifierClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         BlockBreakConfig.loadGlobal();
-
-        ClientLifecycleEvents.CLIENT_STARTED.register(client -> {
-            BlockBreakConfig.loadGlobal();
-        });
+        BlockBreakModifier.LOGGER.info("BlockBreakModifier client initialized.");
     }
 
     public static void onWorldJoin(String worldFolderName) {
         currentWorldName = worldFolderName;
         BlockBreakConfig.loadForWorld(worldFolderName);
-        BlockBreakModifier.LOGGER.info("BlockBreakModifier: active world set to '{}'.", worldFolderName);
     }
 
     public static void onWorldLeave() {
@@ -32,12 +29,9 @@ public class BlockBreakModifierClient implements ClientModInitializer {
 
     public static void reloadForWorld(String worldFolderName) {
         BlockBreakConfig.loadForWorld(worldFolderName);
-        BlockBreakModifier.LOGGER.info("BlockBreakModifier: reloaded config for world '{}'.", worldFolderName);
-    }
-
-    public static void reloadGlobal() {
-        BlockBreakConfig.loadGlobal();
-        BlockBreakModifier.LOGGER.info("BlockBreakModifier: reloaded global config.");
+        BlockBreakModifier.LOGGER.info(
+                "BlockBreakModifier: in-game reload triggered for world '{}'.", worldFolderName
+        );
     }
 
     public static String getCurrentWorldName() {

@@ -5,41 +5,33 @@
 #
 #  WHAT IS THIS FILE?
 #  ------------------
-#  This is the PER-WORLD config. It only applies to the singleplayer world
-#  whose folder name matches the folder this file is in.
+#  This config applies ONLY to the singleplayer world whose folder name matches
+#  the folder this file is stored in.
 #
-#  IMPORTANT: The GLOBAL config overrides this file for any block that is
+#  IMPORTANT: The global config overrides this file if the same block is
 #  defined in both. Use the global config for changes you want everywhere.
 #
-#  HOW TO APPLY CHANGES WITHOUT RESTARTING
-#  ----------------------------------------
-#  1. Edit this file (or the global config) and save it.
+#  HOW TO RELOAD WITHOUT RESTARTING
+#  ---------------------------------
+#  1. Edit and save this file (or the global config).
 #  2. Go to the Singleplayer world selection screen.
 #  3. Hover over your world in the list.
-#  4. Click the "↻ BBM" button that appears at the bottom right of the entry.
-#  5. Changes are applied instantly - no restart needed.
+#  4. Click the "\u21BB BBM" button at the bottom-right of the entry.
+#  5. Done - changes apply instantly in-game.
 #
-#  HOW BLOCK AND TOOL IDs WORK
-#  ---------------------------
-#  Replace ":" with "." in all Minecraft IDs:
-#    minecraft:obsidian  ->  minecraft.obsidian
-#    minecraft:wooden_pickaxe -> minecraft.wooden_pickaxe
+#  QUICK REFERENCE
+#  ---------------
+#  Replace ":" with "." in all block and tool IDs:
+#    minecraft:obsidian        ->  minecraft.obsidian
+#    minecraft:wooden_pickaxe  ->  minecraft.wooden_pickaxe
+#    minecraft:air             ->  minecraft.air  (empty hand)
 #
-#  BREAKING SPEED GUIDE
-#  --------------------
-#  Higher number = faster break.
-#    1.0   = bare hand on dirt
-#    8.0   = diamond pickaxe on stone
-#    50.0  = near-instant
-#    100.0 = instant
-#
-#  BLAST RESISTANCE (optional per block)
-#  --------------------------------------
-#  Obsidian default: 1200.0  |  Set to 0.0 for TNT-destroyable.
+#  Breaking speed: higher = faster. 8.0 = diamond pickaxe on stone. 100.0 = instant.
+#  Blast resistance: optional. 1200.0 = vanilla obsidian. 0.0 = TNT-destroyable.
 #
 # =============================================================================
-#
-#  EXAMPLES  (commented out - uncomment and edit to activate)
+#  EXAMPLES (uncomment to activate)
+# =============================================================================
 #
 # blocks:
 #   minecraft.obsidian:
