@@ -26,8 +26,10 @@ dependencies {
 
 processResources {
 	inputs.property "version", project.version
-	filtersRecursive "**/*.json", "**/*.mcmeta"
-	expand "version": project.version
+
+	filesMatching(["**/*.json", "**/*.mcmeta"]) {
+		expand "version": project.version
+	}
 }
 
 tasks.withType(JavaCompile).configureEach {
