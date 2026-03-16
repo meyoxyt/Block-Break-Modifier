@@ -4,6 +4,7 @@ import com.blockbreakmodifier.client.BlockBreakModifierClient;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.world.WorldListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -17,7 +18,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import net.minecraft.client.gui.Click;
 
 @Environment(EnvType.CLIENT)
 @Mixin(WorldListWidget.WorldEntry.class)
@@ -89,7 +89,7 @@ public abstract class WorldListEntryMixin {
     ) {
         if (blockbreakmodifier$reloadButton != null
                 && blockbreakmodifier$reloadButton.mouseClicked(
-                        click.posX(), click.posY(), click.button()
+                        click.x(), click.y(), click.button()
                 )) {
             cir.setReturnValue(true);
         }
