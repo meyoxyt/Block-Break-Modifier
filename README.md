@@ -1,7 +1,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Minecraft-1.21.11-brightgreen?style=for-the-badge&logo=minecraft" alt="Minecraft 1.21.11"/>
   <img src="https://img.shields.io/badge/Loader-Fabric-blue?style=for-the-badge" alt="Fabric"/>
-  <img src="https://img.shields.io/badge/Version-2.0.0-orange?style=for-the-badge" alt="v2.0.0"/>
+  <img src="https://img.shields.io/badge/Version-1.0.0-orange?style=for-the-badge" alt="v1.0.0"/>
   <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" alt="MIT License"/>
   <img src="https://img.shields.io/badge/Author-ELITE%20Studios-red?style=for-the-badge" alt="ELITE Studios"/>
 </p>
@@ -36,7 +36,7 @@
 
 1. Install [Fabric Loader 0.18.1+](https://fabricmc.net/use/) for Minecraft **1.21.11**
 2. Install [Fabric API 0.141.3+1.21.11](https://modrinth.com/mod/fabric-api)
-3. Drop `blockbreakmodifier-2.0.0.jar` into your `mods/` folder
+3. Drop `blockbreakmodifier-1.0.0.jar` into your `mods/` folder
 4. Launch the game — configs are auto-created:
    ```
    .minecraft/config/blockbreakmodifier/blockbreakmodifier-config.yml          <- global
@@ -209,7 +209,7 @@ Block-Break-Modifier/
 │       ├── MiningSpeedMixin.java           # Intercepts PlayerEntity#getBlockBreakingSpeed
 │       ├── BlastResistanceMixin.java       # Intercepts AbstractBlockState#getBlastResistance
 │       ├── WorldJoinMixin.java             # Detects joinWorld / disconnect (client-only)
-│       └── WorldListEntryMixin.java        # Injects the \u21bb BBM button into world list
+│       └── WorldListEntryMixin.java        # Injects the ↻ BBM button into world list
 ├── src/main/resources/
 │   ├── fabric.mod.json
 │   ├── blockbreakmodifier.mixins.json      # Server+client mixins
@@ -233,7 +233,7 @@ cd "Block-Break-Modifier"
 ./gradlew build
 ```
 
-Output: `build/libs/blockbreakmodifier-2.0.0.jar`
+Output: `build/libs/blockbreakmodifier-1.0.0.jar`
 
 ---
 
