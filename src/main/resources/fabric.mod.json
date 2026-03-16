@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "id": "blockbreakmodifier",
+  "version": "${version}",
+  "name": "BlockBreakModifier",
+  "description": "Fully customizable block-break tool and speed overrides via YAML config.",
+  "authors": [
+    "ELITE Studios"
+  ],
+  "contact": {
+    "homepage": "https://plugincenter.store",
+    "sources": "https://github.com/meyoxyt/Block-Break-Modifier"
+  },
+  "license": "MIT",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.blockbreakmodifier.BlockBreakModifier"
+    ]
+  },
+  "mixins": [
+    "blockbreakmodifier.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.15.0",
+    "fabric-api": "*",
+    "minecraft": "~1.21"
+  }
+}

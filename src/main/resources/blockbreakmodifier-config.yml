@@ -1,0 +1,113 @@
+# =============================================================================
+#  BlockBreakModifier - Configuration File
+#  Created by ELITE Studios  |  https://github.com/meyoxyt/Block-Break-Modifier
+# =============================================================================
+#
+#  OVERVIEW
+#  --------
+#  This file lets you override:
+#    1. Which tool(s) can break a block and at what speed.
+#    2. The blast resistance of any block.
+#
+#  HOW BLOCK IDs WORK
+#  ------------------
+#  Block IDs follow the Minecraft namespaced format:  namespace:block_name
+#  Examples:
+#    minecraft:obsidian
+#    minecraft:stone
+#    minecraft:diamond_ore
+#    somemod:custom_block
+#
+#  Because YAML does not allow colons in plain keys, replace ":" with "." in
+#  this config file. The mod converts them back automatically at runtime.
+#    minecraft:obsidian  ->  minecraft.obsidian
+#
+#  HOW TOOL IDs WORK
+#  -----------------
+#  Tool IDs also use the same namespaced format and the same colon-to-dot rule:
+#    minecraft:wooden_pickaxe    ->  minecraft.wooden_pickaxe
+#    minecraft:stone_pickaxe     ->  minecraft.stone_pickaxe
+#    minecraft:iron_pickaxe      ->  minecraft.iron_pickaxe
+#    minecraft:golden_pickaxe    ->  minecraft.golden_pickaxe
+#    minecraft:diamond_pickaxe   ->  minecraft.diamond_pickaxe
+#    minecraft:netherite_pickaxe ->  minecraft.netherite_pickaxe
+#    minecraft:wooden_shovel     ->  minecraft.wooden_shovel
+#    minecraft:wooden_axe        ->  minecraft.wooden_axe
+#    minecraft:shears            ->  minecraft.shears
+#    minecraft:air               ->  minecraft.air  (bare hand / no item held)
+#
+#  BREAKING SPEED VALUES
+#  ---------------------
+#  The speed value is a float. Higher = faster break.
+#  Vanilla reference speeds for a diamond pickaxe:
+#    minecraft:stone         ~  8.0
+#    minecraft:obsidian      ~  8.0  (normally takes 50 seconds with bare hands)
+#    minecraft:netherrack    ~  8.0
+#  A value of 1.0 is roughly "bare-hand speed on dirt".
+#  A value of 100.0 will feel nearly instant.
+#
+#  BLAST RESISTANCE
+#  ----------------
+#  Optional. Controls how resistant the block is to explosions.
+#  Vanilla values:
+#    Obsidian      : 1200.0
+#    Stone         :    6.0
+#    Dirt          :    0.5
+#    Bedrock       : 3600000.0
+#  Set to 0.0 to make a block fully non-blast-resistant.
+#
+#  FULL STRUCTURE REFERENCE
+#  ------------------------
+#  blocks:
+#    <namespace>.<block_name>:
+#      blast-resistance: <float>          # optional
+#      breaking-tools:
+#        <namespace>.<tool_name>: <speed> # one line per tool
+#
+# =============================================================================
+#
+#  EXAMPLES  (all commented out - uncomment and edit to activate)
+#
+# Make obsidian breakable with a wooden pickaxe at nearly instant speed,
+# and also lower its blast resistance so TNT can destroy it:
+#
+# blocks:
+#   minecraft.obsidian:
+#     blast-resistance: 10.0
+#     breaking-tools:
+#       minecraft.wooden_pickaxe: 50.0
+#       minecraft.stone_pickaxe: 80.0
+#       minecraft.iron_pickaxe: 100.0
+#
+# Make ancient debris breakable by a golden pickaxe, fast:
+#
+# blocks:
+#   minecraft.ancient_debris:
+#     breaking-tools:
+#       minecraft.golden_pickaxe: 60.0
+#
+# Allow bare-hand breaking of stone (minecraft:air = empty hand):
+#
+# blocks:
+#   minecraft.stone:
+#     breaking-tools:
+#       minecraft.air: 5.0
+#
+# Multi-block example - configure several blocks at once:
+#
+# blocks:
+#   minecraft.obsidian:
+#     blast-resistance: 10.0
+#     breaking-tools:
+#       minecraft.wooden_pickaxe: 50.0
+#   minecraft.crying_obsidian:
+#     blast-resistance: 10.0
+#     breaking-tools:
+#       minecraft.wooden_pickaxe: 50.0
+#   minecraft.diamond_ore:
+#     breaking-tools:
+#       minecraft.wooden_pickaxe: 30.0
+#
+# =============================================================================
+
+blocks:
