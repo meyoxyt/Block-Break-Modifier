@@ -22,8 +22,6 @@ public abstract class BlastResistanceMixin {
         AbstractBlock.AbstractBlockState self = (AbstractBlock.AbstractBlockState) (Object) this;
         Block block = self.getBlock();
         Identifier blockId = Registries.BLOCK.getId(block);
-        BlockBreakConfig.getBlastResistance(blockId.toString()).ifPresent(resistance -> {
-            cir.setReturnValue(resistance);
-        });
+        BlockBreakConfig.getBlastResistance(blockId.toString()).ifPresent(cir::setReturnValue);
     }
 }

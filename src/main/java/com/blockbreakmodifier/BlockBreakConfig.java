@@ -1,7 +1,6 @@
 package com.blockbreakmodifier;
 
 import net.fabricmc.loader.api.FabricLoader;
-import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.*;
@@ -11,24 +10,49 @@ import java.util.*;
 
 public class BlockBreakConfig {
 
-    private static final Path CONFIG_PATH = FabricLoader.getInstance()
+    private static final Path CONFIG_ROOT = FabricLoader.getInstance()
             .getConfigDir()
-            .resolve("blockbreakmodifier-config.yml");
+            .resolve("blockbreakmodifier");
 
-    private static Map<String, BlockEntry> blockEntries = new HashMap<>();
+    private static final Path GLOBAL_CONFIG = CONFIG_ROOT.resolve("blockbreakmodifier-config.yml");
 
-    public static void load() {
-        if (!Files.exists(CONFIG_PATH)) {
-            writeDefault();
-            return;
-        }
-        try (InputStream is = Files.newInputStream(CONFIG_PATH)) {
+    private static Map<String, BlockEntry> activeEntries = new HashMap<>();
+
+    public static void loadGlobal() {
+        ensureGlobalConfig();
+        activeEntries = parseFile(GLOBAL_CONFIG);
+        BlockBreakModifier.LOGGER.info("BlockBreakModifier: loaded global config ({} override(s)).", activeEntries.size());
+    }
+
+    public static void loadForWorld(String worldFolderName) {
+        ensureGlobalConfig();
+        Map<String, BlockEntry> global = parseFile(GLOBAL_CONFIG);
+
+        Path worldDir = CONFIG_ROOT.resolve(worldFolderName);
+        Path worldConfig = worldDir.resolve("blockbreakmodifier-config.yml");
+        ensureWorldConfig(worldDir, worldConfig, worldFolderName);
+
+        Map<String, BlockEntry> world = parseFile(worldConfig);
+
+        Map<String, BlockEntry> merged = new HashMap<>(world);
+        global.forEach(merged::put);
+
+        activeEntries = merged;
+        BlockBreakModifier.LOGGER.info(
+                "BlockBreakModifier: loaded config for world '{}' ({} world + {} global = {} total override(s)).",
+                worldFolderName, world.size(), global.size(), merged.size()
+        );
+    }
+
+    private static Map<String, BlockEntry> parseFile(Path path) {
+        if (!Files.exists(path)) return new HashMap<>();
+        try (InputStream is = Files.newInputStream(path)) {
             Yaml yaml = new Yaml();
             Map<String, Object> root = yaml.load(is);
-            blockEntries = parse(root);
-            BlockBreakModifier.LOGGER.info("BlockBreakModifier: loaded {} block override(s).", blockEntries.size());
+            return parse(root);
         } catch (IOException e) {
-            BlockBreakModifier.LOGGER.error("BlockBreakModifier: failed to read config.", e);
+            BlockBreakModifier.LOGGER.error("BlockBreakModifier: failed to read config at {}.", path, e);
+            return new HashMap<>();
         }
     }
 
@@ -39,26 +63,24 @@ public class BlockBreakConfig {
         if (!(blocksObj instanceof Map)) return result;
         @SuppressWarnings("unchecked")
         Map<String, Object> blocks = (Map<String, Object>) blocksObj;
-        for (Map.Entry<String, Object> blockEntry : blocks.entrySet()) {
-            String blockId = blockEntry.getKey().replace(".", ":");
-            if (!(blockEntry.getValue() instanceof Map)) continue;
+        for (Map.Entry<String, Object> entry : blocks.entrySet()) {
+            String blockId = entry.getKey().replace(".", ":");
+            if (!(entry.getValue() instanceof Map)) continue;
             @SuppressWarnings("unchecked")
-            Map<String, Object> blockData = (Map<String, Object>) blockEntry.getValue();
+            Map<String, Object> blockData = (Map<String, Object>) entry.getValue();
             Map<String, Float> toolSpeeds = new HashMap<>();
-            Object breakingToolsObj = blockData.get("breaking-tools");
-            if (breakingToolsObj instanceof Map) {
+            Object toolsObj = blockData.get("breaking-tools");
+            if (toolsObj instanceof Map) {
                 @SuppressWarnings("unchecked")
-                Map<String, Object> tools = (Map<String, Object>) breakingToolsObj;
+                Map<String, Object> tools = (Map<String, Object>) toolsObj;
                 for (Map.Entry<String, Object> toolEntry : tools.entrySet()) {
-                    String toolId = toolEntry.getKey().replace(".", ":");
-                    float speed = toFloat(toolEntry.getValue(), 1.0f);
-                    toolSpeeds.put(toolId, speed);
+                    toolSpeeds.put(toolEntry.getKey().replace(".", ":"), toFloat(toolEntry.getValue(), 1.0f));
                 }
             }
             Float blastResistance = null;
             if (blockData.containsKey("blast-resistance")) {
-                blastResistance = toFloat(blockData.get("blast-resistance"), -1f);
-                if (blastResistance < 0) blastResistance = null;
+                float val = toFloat(blockData.get("blast-resistance"), -1f);
+                if (val >= 0) blastResistance = val;
             }
             result.put(blockId, new BlockEntry(toolSpeeds, blastResistance));
         }
@@ -70,39 +92,52 @@ public class BlockBreakConfig {
         try { return Float.parseFloat(obj.toString()); } catch (Exception e) { return fallback; }
     }
 
-    private static void writeDefault() {
-        try {
-            Files.createDirectories(CONFIG_PATH.getParent());
-            try (InputStream template = BlockBreakConfig.class
-                    .getResourceAsStream("/blockbreakmodifier-config.yml")) {
-                if (template != null) {
-                    Files.copy(template, CONFIG_PATH);
+    private static void ensureGlobalConfig() {
+        if (!Files.exists(GLOBAL_CONFIG)) {
+            try {
+                Files.createDirectories(CONFIG_ROOT);
+                try (InputStream src = BlockBreakConfig.class.getResourceAsStream("/blockbreakmodifier-config.yml")) {
+                    if (src != null) Files.copy(src, GLOBAL_CONFIG);
                 }
+                BlockBreakModifier.LOGGER.info("BlockBreakModifier: created default global config.");
+            } catch (IOException e) {
+                BlockBreakModifier.LOGGER.error("BlockBreakModifier: failed to create global config.", e);
             }
-            BlockBreakModifier.LOGGER.info("BlockBreakModifier: default config created.");
-        } catch (IOException e) {
-            BlockBreakModifier.LOGGER.error("BlockBreakModifier: failed to write default config.", e);
+        }
+    }
+
+    private static void ensureWorldConfig(Path worldDir, Path worldConfig, String worldName) {
+        if (!Files.exists(worldConfig)) {
+            try {
+                Files.createDirectories(worldDir);
+                try (InputStream src = BlockBreakConfig.class.getResourceAsStream("/blockbreakmodifier-world-config.yml")) {
+                    if (src != null) Files.copy(src, worldConfig);
+                }
+                BlockBreakModifier.LOGGER.info("BlockBreakModifier: created default config for world '{}'.", worldName);
+            } catch (IOException e) {
+                BlockBreakModifier.LOGGER.error("BlockBreakModifier: failed to create world config for '{}'.", worldName, e);
+            }
         }
     }
 
     public static Optional<Float> getToolSpeed(String blockId, String toolId) {
-        BlockEntry entry = blockEntries.get(blockId);
+        BlockEntry entry = activeEntries.get(blockId);
         if (entry == null) return Optional.empty();
         return Optional.ofNullable(entry.toolSpeeds().get(toolId));
     }
 
     public static boolean hasBlockOverride(String blockId) {
-        return blockEntries.containsKey(blockId);
+        return activeEntries.containsKey(blockId);
     }
 
     public static Optional<Float> getBlastResistance(String blockId) {
-        BlockEntry entry = blockEntries.get(blockId);
+        BlockEntry entry = activeEntries.get(blockId);
         if (entry == null || entry.blastResistance() == null) return Optional.empty();
         return Optional.of(entry.blastResistance());
     }
 
-    public static Map<String, BlockEntry> getBlockEntries() {
-        return Collections.unmodifiableMap(blockEntries);
+    public static Map<String, BlockEntry> getActiveEntries() {
+        return Collections.unmodifiableMap(activeEntries);
     }
 
     public record BlockEntry(Map<String, Float> toolSpeeds, Float blastResistance) {}

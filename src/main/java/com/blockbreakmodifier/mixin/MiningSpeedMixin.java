@@ -33,8 +33,6 @@ public abstract class MiningSpeedMixin {
         Identifier toolId = Registries.ITEM.getId(held.getItem());
         String toolKey = toolId.toString();
 
-        BlockBreakConfig.getToolSpeed(blockKey, toolKey).ifPresent(speed -> {
-            cir.setReturnValue(speed);
-        });
+        BlockBreakConfig.getToolSpeed(blockKey, toolKey).ifPresent(cir::setReturnValue);
     }
 }

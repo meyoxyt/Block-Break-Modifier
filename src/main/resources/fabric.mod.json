@@ -3,7 +3,7 @@
   "id": "blockbreakmodifier",
   "version": "${version}",
   "name": "BlockBreakModifier",
-  "description": "Fully customizable block-break tool and speed overrides via YAML config.",
+  "description": "Fully customizable per-world block-break tool and speed overrides via YAML config. No restart needed.",
   "authors": [
     "ELITE Studios"
   ],
@@ -16,10 +16,17 @@
   "entrypoints": {
     "main": [
       "com.blockbreakmodifier.BlockBreakModifier"
+    ],
+    "client": [
+      "com.blockbreakmodifier.client.BlockBreakModifierClient"
     ]
   },
   "mixins": [
-    "blockbreakmodifier.mixins.json"
+    "blockbreakmodifier.mixins.json",
+    {
+      "config": "blockbreakmodifier.client.mixins.json",
+      "environment": "client"
+    }
   ],
   "depends": {
     "fabricloader": ">=0.15.0",

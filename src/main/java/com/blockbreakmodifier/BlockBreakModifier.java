@@ -11,7 +11,6 @@ public class BlockBreakModifier implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        BlockBreakConfig.load();
         LOGGER.info("BlockBreakModifier initialized.");
     }
 }

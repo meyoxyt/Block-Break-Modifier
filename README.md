@@ -1,6 +1,7 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/Minecraft-1.21.4-brightgreen?style=for-the-badge&logo=minecraft" alt="Minecraft 1.21.4"/>
+  <img src="https://img.shields.io/badge/Minecraft-1.21.1-brightgreen?style=for-the-badge&logo=minecraft" alt="Minecraft 1.21.1"/>
   <img src="https://img.shields.io/badge/Loader-Fabric-blue?style=for-the-badge" alt="Fabric"/>
+  <img src="https://img.shields.io/badge/Version-2.0.0-orange?style=for-the-badge" alt="v2.0.0"/>
   <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" alt="MIT License"/>
   <img src="https://img.shields.io/badge/Author-ELITE%20Studios-red?style=for-the-badge" alt="ELITE Studios"/>
 </p>
@@ -8,7 +9,9 @@
 <h1 align="center">🔨 BlockBreakModifier</h1>
 
 <p align="center">
-  A fully customizable <strong>Fabric mod</strong> that lets you override <em>which tools</em> break any block and <em>how fast</em> — all through a simple YAML config file. No more limits on what breaks what.
+  A fully customizable <strong>Fabric mod</strong> that lets you override <em>which tools</em> break any block and <em>how fast</em>,
+  plus <em>blast resistance</em> — all through simple YAML config files, with <strong>per-world configs</strong>,
+  a <strong>global config</strong>, and an <strong>in-game reload button</strong> so you never need to restart.
 </p>
 
 ---
@@ -17,35 +20,54 @@
 
 - **Override breaking tools** — make any block breakable by any tool (or bare hand)
 - **Override breaking speed** — set an exact float speed per tool per block
-- **Override blast resistance** — control how resistant blocks are to explosions
-- **Per-block, per-tool granularity** — configure each combination independently
-- **Zero extra mod dependencies** — ships with SnakeYAML bundled
-- **Clean YAML config** — human-readable, fully documented, empty by default
+- **Override blast resistance** — control how resistant any block is to explosions
+- **Per-world configs** — every singleplayer world gets its own config folder
+- **Global config** — one file that overrides all worlds and applies on servers
+- **In-game reload** — `↻ BBM` button on world list, no restart needed
+- **Zero extra dependencies** — SnakeYAML is bundled inside the jar
+- **Server support** — global config applies on dedicated servers identically
 - **Open source** — MIT licensed, contributions welcome
 
 ---
 
 ## 📦 Installation
 
-1. Install [Fabric Loader](https://fabricmc.net/use/) for Minecraft **1.21.4**
+1. Install [Fabric Loader](https://fabricmc.net/use/) for Minecraft **1.21.1**
 2. Install [Fabric API](https://modrinth.com/mod/fabric-api)
-3. Drop the `blockbreakmodifier-*.jar` into your `mods/` folder
-4. Launch the game once — the config file is auto-generated at:
+3. Drop `blockbreakmodifier-2.0.0.jar` into your `mods/` folder
+4. Launch the game — config files are auto-created:
    ```
-   config/blockbreakmodifier-config.yml
+   config/blockbreakmodifier/blockbreakmodifier-config.yml          ← global
+   config/blockbreakmodifier/<WorldName>/blockbreakmodifier-config.yml  ← per-world
    ```
-5. Edit the config, save, and restart the game
 
 ---
 
-## ⚙️ Configuration
+## 🗂️ Config Structure
 
-The config lives at:
 ```
-<minecraft folder>/config/blockbreakmodifier-config.yml
+config/
+└── blockbreakmodifier/
+    ├── blockbreakmodifier-config.yml        ← GLOBAL (applies everywhere, overrides worlds)
+    ├── MyWorld/
+    │   └── blockbreakmodifier-config.yml    ← per-world: MyWorld only
+    ├── SurvivalSMP/
+    │   └── blockbreakmodifier-config.yml    ← per-world: SurvivalSMP only
+    └── HardcoreWorld/
+        └── blockbreakmodifier-config.yml    ← per-world: HardcoreWorld only
 ```
 
-### Format Overview
+### Priority Rule
+
+> **Global config always wins.** If the same block is defined in both a world config and the global config, the global definition is used.
+
+This lets you set server-wide / all-worlds overrides in the global config, while keeping world-specific tweaks in each world's own file.
+
+---
+
+## ⚙️ Config Format
+
+Both config files use the same YAML format:
 
 ```yaml
 blocks:
@@ -55,32 +77,29 @@ blocks:
       <namespace>.<tool_name>: <speed_float>
 ```
 
-> **Important:** Because YAML treats colons (`:`) as special syntax, replace all
-> colons in Minecraft IDs with dots (`.`) inside the config file.  
-> `minecraft:obsidian` → `minecraft.obsidian`  
-> The mod converts them back automatically at runtime.
+> **Key rule:** Replace all `:` in Minecraft IDs with `.` in the config.
+> The mod converts them back automatically.
+> `minecraft:obsidian` → `minecraft.obsidian`
 
 ---
 
 ### 🔧 Breaking Speed Reference
 
-| Speed Value | Feel |
-|-------------|------|
-| `1.0` | Bare-hand on dirt |
-| `4.0` | Moderate — wooden pickaxe on stone |
-| `8.0` | Fast — diamond pickaxe on stone |
+| Speed | Feel |
+|-------|------|
+| `1.0` | Bare hand on dirt |
+| `4.0` | Wooden pickaxe on stone |
+| `8.0` | Diamond pickaxe on stone |
 | `30.0` | Very fast |
 | `50.0` | Near-instant |
 | `100.0` | Instant |
-
-Vanilla speed values are multiplied by efficiency enchantments on top. A value you set here is the **base speed** returned to the game engine before enchantments are applied.
 
 ---
 
 ### 💥 Blast Resistance Reference
 
-| Block | Vanilla Blast Resistance |
-|-------|-------------------------|
+| Block | Vanilla Value |
+|-------|---------------|
 | Dirt | `0.5` |
 | Stone | `6.0` |
 | Obsidian | `1200.0` |
@@ -88,13 +107,13 @@ Vanilla speed values are multiplied by efficiency enchantments on top. A value y
 | Ancient Debris | `1200.0` |
 | Bedrock | `3600000.0` |
 
-Set to `0.0` to make a block fully destroyable by explosions.
+Set to `0.0` to make a block fully destroyable by TNT.
 
 ---
 
 ## 📝 Config Examples
 
-### Example 1 — Obsidian with a Wooden Pickaxe (near-instant)
+### Example 1 — Obsidian with Wooden Pickaxe (near-instant, TNT-destroyable)
 
 ```yaml
 blocks:
@@ -106,7 +125,7 @@ blocks:
       minecraft.iron_pickaxe: 100.0
 ```
 
-### Example 2 — Ancient Debris with a Golden Pickaxe
+### Example 2 — Ancient Debris with Golden Pickaxe
 
 ```yaml
 blocks:
@@ -117,7 +136,7 @@ blocks:
 
 ### Example 3 — Stone with Bare Hands
 
-> `minecraft:air` represents an empty hand (no item held).
+> `minecraft.air` = no item held (empty hand)
 
 ```yaml
 blocks:
@@ -148,7 +167,7 @@ blocks:
       minecraft.wooden_shovel: 10.0
 ```
 
-### Example 5 — Custom Mod Block
+### Example 5 — Custom Modded Block
 
 ```yaml
 blocks:
@@ -161,7 +180,19 @@ blocks:
 
 ---
 
-## 🧰 Tool ID Reference
+## 🔄 Reloading Without Restart
+
+1. Edit any config file and save it
+2. Open **Singleplayer** world list
+3. Hover your mouse over a world entry
+4. Click the **`↻ BBM`** button that appears at the bottom-right of the entry
+5. A chat message confirms the reload — changes apply instantly
+
+On **servers**, the global config is loaded once on startup. To hot-reload on a server, a restart is currently required (server-side `/bbm reload` command planned for v2.1.0).
+
+---
+
+## 🛠️ Tool ID Reference
 
 | Tool | Config Key |
 |------|------------|
@@ -172,7 +203,6 @@ blocks:
 | Diamond Pickaxe | `minecraft.diamond_pickaxe` |
 | Netherite Pickaxe | `minecraft.netherite_pickaxe` |
 | Wooden Shovel | `minecraft.wooden_shovel` |
-| Stone Shovel | `minecraft.stone_shovel` |
 | Wooden Axe | `minecraft.wooden_axe` |
 | Shears | `minecraft.shears` |
 | Empty Hand | `minecraft.air` |
@@ -185,15 +215,21 @@ blocks:
 ```
 Block-Break-Modifier/
 ├── src/main/java/com/blockbreakmodifier/
-│   ├── BlockBreakModifier.java          # Mod entrypoint
-│   ├── BlockBreakConfig.java            # YAML config loader & data store
+│   ├── BlockBreakModifier.java              # Mod entrypoint (server + client)
+│   ├── BlockBreakConfig.java               # YAML loader, merger, data store
+│   ├── client/
+│   │   └── BlockBreakModifierClient.java   # Client entrypoint, world join/leave hooks
 │   └── mixin/
-│       ├── MiningSpeedMixin.java        # Intercepts getBlockBreakingSpeed
-│       └── BlastResistanceMixin.java    # Intercepts getBlastResistance
+│       ├── MiningSpeedMixin.java           # Intercepts getBlockBreakingSpeed
+│       ├── BlastResistanceMixin.java       # Intercepts getBlastResistance
+│       ├── WorldJoinMixin.java             # Detects world join/leave (client-only)
+│       └── WorldListEntryMixin.java        # Adds ↻ BBM button to world list
 ├── src/main/resources/
 │   ├── fabric.mod.json
 │   ├── blockbreakmodifier.mixins.json
-│   └── blockbreakmodifier-config.yml   # Bundled default config template
+│   ├── blockbreakmodifier.client.mixins.json
+│   ├── blockbreakmodifier-config.yml        # Default global config template
+│   └── blockbreakmodifier-world-config.yml  # Default per-world config template
 ├── build.gradle
 ├── gradle.properties
 ├── settings.gradle
@@ -207,24 +243,24 @@ Block-Break-Modifier/
 
 ```bash
 git clone https://github.com/meyoxyt/Block-Break-Modifier.git
-cd Block-Break-Modifier
+cd "Block-Break-Modifier"
 ./gradlew build
 ```
 
-The compiled jar will be at `build/libs/blockbreakmodifier-1.0.0.jar`.
+Output: `build/libs/blockbreakmodifier-2.0.0.jar`
 
 ---
 
 ## 🤝 Contributing
 
-Pull requests and issues are welcome!  
-Please open an issue first if you plan a large change so we can discuss it.
+Pull requests and issues are welcome!
+Please open an issue first for large changes.
 
 ---
 
 ## 📄 License
 
-This project is licensed under the **MIT License** — see [LICENSE](LICENSE) for details.
+MIT License — see [LICENSE](LICENSE) for details.
 
 ---
 

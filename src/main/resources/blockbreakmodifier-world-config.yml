@@ -1,0 +1,58 @@
+# =============================================================================
+#  BlockBreakModifier - PER-WORLD Config
+#  Created by ELITE Studios | https://github.com/meyoxyt/Block-Break-Modifier
+# =============================================================================
+#
+#  WHAT IS THIS FILE?
+#  ------------------
+#  This is the PER-WORLD config. It only applies to the singleplayer world
+#  whose folder name matches the folder this file is in.
+#
+#  IMPORTANT: The GLOBAL config overrides this file for any block that is
+#  defined in both. Use the global config for changes you want everywhere.
+#
+#  HOW TO APPLY CHANGES WITHOUT RESTARTING
+#  ----------------------------------------
+#  1. Edit this file (or the global config) and save it.
+#  2. Go to the Singleplayer world selection screen.
+#  3. Hover over your world in the list.
+#  4. Click the "↻ BBM" button that appears at the bottom right of the entry.
+#  5. Changes are applied instantly - no restart needed.
+#
+#  HOW BLOCK AND TOOL IDs WORK
+#  ---------------------------
+#  Replace ":" with "." in all Minecraft IDs:
+#    minecraft:obsidian  ->  minecraft.obsidian
+#    minecraft:wooden_pickaxe -> minecraft.wooden_pickaxe
+#
+#  BREAKING SPEED GUIDE
+#  --------------------
+#  Higher number = faster break.
+#    1.0   = bare hand on dirt
+#    8.0   = diamond pickaxe on stone
+#    50.0  = near-instant
+#    100.0 = instant
+#
+#  BLAST RESISTANCE (optional per block)
+#  --------------------------------------
+#  Obsidian default: 1200.0  |  Set to 0.0 for TNT-destroyable.
+#
+# =============================================================================
+#
+#  EXAMPLES  (commented out - uncomment and edit to activate)
+#
+# blocks:
+#   minecraft.obsidian:
+#     blast-resistance: 10.0
+#     breaking-tools:
+#       minecraft.wooden_pickaxe: 50.0
+#       minecraft.iron_pickaxe: 100.0
+#
+# blocks:
+#   minecraft.ancient_debris:
+#     breaking-tools:
+#       minecraft.golden_pickaxe: 60.0
+#
+# =============================================================================
+
+blocks:
