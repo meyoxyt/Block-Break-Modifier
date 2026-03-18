@@ -1,19 +1,19 @@
 package com.blockbreakmodifier.mixin;
 
 import com.blockbreakmodifier.BlockBreakConfig;
-import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.BlockView;
 import net.minecraft.world.explosion.Explosion;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(AbstractBlock.class)
+@Mixin(Block.class)
 public abstract class BlastResistanceMixin {
 
     @Inject(
@@ -23,7 +23,7 @@ public abstract class BlastResistanceMixin {
     )
     private void blockbreakmodifier$overrideBlastResistance(
             BlockState state,
-            net.minecraft.world.BlockView world,
+            BlockView world,
             BlockPos pos,
             Explosion explosion,
             CallbackInfoReturnable<Float> cir
