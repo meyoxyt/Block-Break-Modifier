@@ -4,7 +4,6 @@ import com.blockbreakmodifier.client.BlockBreakModifierClient;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.world.WorldListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -21,33 +20,28 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Environment(EnvType.CLIENT)
 @Mixin(WorldListWidget.WorldEntry.class)
-public abstract class WorldListEntryMixin {
+public abstract class WorldListEntryMixin extends net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget.Entry<WorldListWidget.WorldEntry> {
 
-    @Shadow
-    @Final
-    LevelSummary level;
+    @Shadow @Final LevelSummary level;
 
     @Unique
     private ButtonWidget blockbreakmodifier$reloadButton;
 
-    @Inject(
-            method = "render",
-            at = @At("TAIL")
-    )
+    @Inject(method = "render", at = @At("TAIL"))
     private void blockbreakmodifier$renderReloadButton(
             DrawContext context,
+            int index,
+            int y,
+            int x,
+            int entryWidth,
+            int entryHeight,
             int mouseX,
             int mouseY,
             boolean hovered,
-            float deltaTicks,
+            float tickDelta,
             CallbackInfo ci
     ) {
         if (!hovered) return;
-
-        int entryX = this.getX();
-        int entryY = this.getY();
-        int entryWidth = this.getWidth();
-        int entryHeight = this.getHeight();
 
         if (blockbreakmodifier$reloadButton == null) {
             String worldId = level.getName();
@@ -63,47 +57,25 @@ public abstract class WorldListEntryMixin {
                             );
                         }
                     }
-            ).dimensions(
-                    entryX + entryWidth - 60,
-                    entryY + entryHeight - 20,
-                    58,
-                    18
-            ).build();
+            ).dimensions(x + entryWidth - 60, y + entryHeight - 20, 58, 18).build();
         } else {
-            blockbreakmodifier$reloadButton.setX(entryX + entryWidth - 60);
-            blockbreakmodifier$reloadButton.setY(entryY + entryHeight - 20);
+            blockbreakmodifier$reloadButton.setX(x + entryWidth - 60);
+            blockbreakmodifier$reloadButton.setY(y + entryHeight - 20);
         }
 
-        blockbreakmodifier$reloadButton.render(context, mouseX, mouseY, deltaTicks);
+        blockbreakmodifier$reloadButton.render(context, mouseX, mouseY, tickDelta);
     }
 
-    @Inject(
-            method = "mouseClicked",
-            at = @At("HEAD"),
-            cancellable = true
-    )
+    @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
     private void blockbreakmodifier$handleReloadClick(
-            Click click,
-            boolean doubled,
+            double mouseX,
+            double mouseY,
+            int button,
             CallbackInfoReturnable<Boolean> cir
     ) {
         if (blockbreakmodifier$reloadButton != null
-                && blockbreakmodifier$reloadButton.mouseClicked(
-                        click.x(), click.y(), click.button()
-                )) {
+                && blockbreakmodifier$reloadButton.mouseClicked(mouseX, mouseY, button)) {
             cir.setReturnValue(true);
         }
     }
-
-    @Shadow
-    public abstract int getX();
-
-    @Shadow
-    public abstract int getY();
-
-    @Shadow
-    public abstract int getWidth();
-
-    @Shadow
-    public abstract int getHeight();
 }

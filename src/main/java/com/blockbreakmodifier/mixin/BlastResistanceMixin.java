@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class BlastResistanceMixin {
 
     @Inject(
-            method = "getBlastResistance",
+            method = "getBlastResistance()F",
             at = @At("RETURN"),
             cancellable = true
     )
