@@ -46,6 +46,8 @@ java {
 }
 
 jar {
+	// Force exact output name: BlockBreakModifier-1.0.0.jar
+	archiveFileName = "${project.archives_base_name}-${project.mod_version}.jar"
 	from("LICENSE") {
 		rename { "${it}_${project.archives_base_name}" }
 	}
