@@ -54,8 +54,10 @@ public abstract class WorldListEntryMixin {
                         BlockBreakModifierClient.reloadForWorld(worldId);
                         Minecraft mc = Minecraft.getInstance();
                         if (mc.player != null) {
-                            mc.player.sendSystemMessage(
-                                    Component.literal("\u00a7a[BBM] \u00a77Reloaded config for world: \u00a7e" + worldId)
+                            // displayClientMessage is stable across all 1.21.x
+                            mc.player.displayClientMessage(
+                                    Component.literal("\u00a7a[BBM] \u00a77Reloaded config for world: \u00a7e" + worldId),
+                                    false
                             );
                         }
                     }
