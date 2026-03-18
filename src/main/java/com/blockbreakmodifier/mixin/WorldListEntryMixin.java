@@ -27,7 +27,11 @@ public abstract class WorldListEntryMixin {
     @Unique
     private Button blockbreakmodifier$reloadButton;
 
-    @Inject(method = "render", at = @At("TAIL"))
+    @Inject(
+            method = "render",
+            at = @At("TAIL"),
+            require = 0
+    )
     private void blockbreakmodifier$renderReloadButton(
             GuiGraphics graphics,
             int index,
@@ -51,7 +55,7 @@ public abstract class WorldListEntryMixin {
                         Minecraft mc = Minecraft.getInstance();
                         if (mc.player != null) {
                             mc.player.sendSystemMessage(
-                                    Component.literal("§a[BBM] §7Reloaded config for world: §e" + worldId)
+                                    Component.literal("\u00a7a[BBM] \u00a77Reloaded config for world: \u00a7e" + worldId)
                             );
                         }
                     }
@@ -63,7 +67,12 @@ public abstract class WorldListEntryMixin {
         blockbreakmodifier$reloadButton.render(graphics, mouseX, mouseY, partialTick);
     }
 
-    @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
+    @Inject(
+            method = "mouseClicked",
+            at = @At("HEAD"),
+            cancellable = true,
+            require = 0
+    )
     private void blockbreakmodifier$handleReloadClick(
             double mouseX,
             double mouseY,

@@ -9,11 +9,8 @@ import net.minecraft.world.level.block.state.BlockState;
 
 /**
  * Base implementation using MojangMappings API names.
- * These names are STABLE across all 1.21.x versions — Mojang does not
- * rename methods between minor versions in the same era.
- *
- * All version handlers extend this. Override a method only if Mojang
- * actually changed the API between versions.
+ * Compiled against 1.21.5 — stable across all 1.21.x at runtime.
+ * All version handlers extend this.
  */
 public abstract class BaseVersionHandler implements VersionHandler {
 
@@ -21,7 +18,7 @@ public abstract class BaseVersionHandler implements VersionHandler {
     public String getBlockId(BlockState state) {
         Block block = state.getBlock();
         ResourceLocation id = BuiltInRegistries.BLOCK.getKey(block);
-        return id.toString();
+        return id != null ? id.toString() : "minecraft:air";
     }
 
     @Override
@@ -29,7 +26,7 @@ public abstract class BaseVersionHandler implements VersionHandler {
         ItemStack stack = player.getMainHandItem();
         if (stack.isEmpty()) return "minecraft:air";
         ResourceLocation id = BuiltInRegistries.ITEM.getKey(stack.getItem());
-        return id.toString();
+        return id != null ? id.toString() : "minecraft:air";
     }
 
     @Override

@@ -18,7 +18,8 @@ public abstract class BlastResistanceMixin {
     @Inject(
             method = "getExplosionResistance(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/Explosion;)F",
             at = @At("RETURN"),
-            cancellable = true
+            cancellable = true,
+            require = 0
     )
     private void blockbreakmodifier$overrideBlastResistance(
             BlockState state,
