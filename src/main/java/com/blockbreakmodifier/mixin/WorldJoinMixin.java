@@ -14,8 +14,25 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(Minecraft.class)
 public abstract class WorldJoinMixin {
 
+    /**
+     * Fired when a world/level is set on the Minecraft client.
+     * We extract the level storage name and pass it to the client handler
+     * so per-world configs load correctly.
+     *
+     * For singleplayer: ClientLevel has a levelData name that matches the save folder.
+     * For multiplayer: levelData name is the server address — we use that as the world ID
+     *                  so each server gets its own config folder.
+     */
     @Inject(method = "setLevel", at = @At("HEAD"))
     private void blockbreakmodifier$onWorldJoin(ClientLevel level, CallbackInfo ci) {
+        if (level != null) {
+            // getLevelData().getLevelName() returns the world folder name in singleplayer
+            // and the server address string in multiplayer — both are valid unique IDs
+            String worldId = level.getLevelData().getLevelName();
+            if (worldId != null && !worldId.isBlank()) {
+                BlockBreakModifierClient.setCurrentWorldId(worldId);
+            }
+        }
         BlockBreakModifierClient.onWorldJoin();
     }
 

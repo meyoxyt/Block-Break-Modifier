@@ -2,6 +2,7 @@ package com.blockbreakmodifier.version;
 
 /**
  * MC 1.21.4 — Protocol 769
+ * "The Garden Awakens" — December 2024
  */
 public class V1_21_4Handler extends BaseVersionHandler {
 

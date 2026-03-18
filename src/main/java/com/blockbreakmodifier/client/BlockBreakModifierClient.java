@@ -16,9 +16,20 @@ public class BlockBreakModifierClient implements ClientModInitializer {
         BlockBreakModifier.LOGGER.info("[BBM] Client initialized.");
     }
 
+    /**
+     * Called when the client joins a world/level.
+     * currentWorldId must be set via setCurrentWorldId() before this is called
+     * (done in WorldJoinMixin) so per-world config loads correctly.
+     * Falls back to global config if world ID is somehow still null.
+     */
     public static void onWorldJoin() {
-        if (currentWorldId != null) {
+        if (currentWorldId != null && !currentWorldId.isBlank()) {
             BlockBreakConfig.loadForWorld(currentWorldId);
+        } else {
+            BlockBreakModifier.LOGGER.warn(
+                    "[BBM] onWorldJoin() called but currentWorldId is null — loading global config as fallback."
+            );
+            BlockBreakConfig.loadGlobal();
         }
     }
 
@@ -29,6 +40,7 @@ public class BlockBreakModifierClient implements ClientModInitializer {
 
     public static void setCurrentWorldId(String worldId) {
         currentWorldId = worldId;
+        BlockBreakModifier.LOGGER.info("[BBM] World ID set to: {}", worldId);
     }
 
     public static void reloadForWorld(String worldId) {

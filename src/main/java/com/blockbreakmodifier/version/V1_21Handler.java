@@ -2,7 +2,9 @@ package com.blockbreakmodifier.version;
 
 /**
  * MC 1.21 — Protocol 767
- * 1.21 and 1.21.1 share the same protocol version.
+ * "Tricky Trials" — June 2024
+ * Note: 1.21 and 1.21.1 share protocol 767.
+ * The registry picks V1_21_1Handler as more specific (same minProtocol, registered later).
  */
 public class V1_21Handler extends BaseVersionHandler {
 
