@@ -3,26 +3,32 @@ package com.blockbreakmodifier.mixin;
 import com.blockbreakmodifier.BlockBreakConfig;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.explosion.Explosion;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(AbstractBlock.AbstractBlockState.class)
+@Mixin(AbstractBlock.class)
 public abstract class BlastResistanceMixin {
 
     @Inject(
-            method = "getBlastResistance()F",
+            method = "getBlastResistance(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/world/explosion/Explosion;)F",
             at = @At("RETURN"),
             cancellable = true
     )
     private void blockbreakmodifier$overrideBlastResistance(
+            BlockState state,
+            net.minecraft.world.BlockView world,
+            BlockPos pos,
+            Explosion explosion,
             CallbackInfoReturnable<Float> cir
     ) {
-        AbstractBlock.AbstractBlockState self = (AbstractBlock.AbstractBlockState) (Object) this;
-        Block block = self.getBlock();
+        Block block = state.getBlock();
         Identifier blockId = Registries.BLOCK.getId(block);
         BlockBreakConfig.getBlastResistance(blockId.toString()).ifPresent(cir::setReturnValue);
     }

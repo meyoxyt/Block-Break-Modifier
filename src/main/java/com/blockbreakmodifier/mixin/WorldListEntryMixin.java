@@ -20,14 +20,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Environment(EnvType.CLIENT)
 @Mixin(WorldListWidget.WorldEntry.class)
-public abstract class WorldListEntryMixin extends net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget.Entry<WorldListWidget.WorldEntry> {
+public abstract class WorldListEntryMixin {
 
     @Shadow @Final LevelSummary level;
 
     @Unique
     private ButtonWidget blockbreakmodifier$reloadButton;
 
-    @Inject(method = "render", at = @At("TAIL"))
+    @Inject(
+            method = "render",
+            at = @At("TAIL")
+    )
     private void blockbreakmodifier$renderReloadButton(
             DrawContext context,
             int index,
@@ -43,8 +46,9 @@ public abstract class WorldListEntryMixin extends net.minecraft.client.gui.widge
     ) {
         if (!hovered) return;
 
+        String worldId = level.getName();
+
         if (blockbreakmodifier$reloadButton == null) {
-            String worldId = level.getName();
             blockbreakmodifier$reloadButton = ButtonWidget.builder(
                     Text.literal("\u21BB BBM"),
                     btn -> {
@@ -57,16 +61,20 @@ public abstract class WorldListEntryMixin extends net.minecraft.client.gui.widge
                             );
                         }
                     }
-            ).dimensions(x + entryWidth - 60, y + entryHeight - 20, 58, 18).build();
+            ).dimensions(x + entryWidth - 62, y + entryHeight - 20, 60, 18).build();
         } else {
-            blockbreakmodifier$reloadButton.setX(x + entryWidth - 60);
+            blockbreakmodifier$reloadButton.setX(x + entryWidth - 62);
             blockbreakmodifier$reloadButton.setY(y + entryHeight - 20);
         }
 
         blockbreakmodifier$reloadButton.render(context, mouseX, mouseY, tickDelta);
     }
 
-    @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
+    @Inject(
+            method = "mouseClicked",
+            at = @At("HEAD"),
+            cancellable = true
+    )
     private void blockbreakmodifier$handleReloadClick(
             double mouseX,
             double mouseY,
