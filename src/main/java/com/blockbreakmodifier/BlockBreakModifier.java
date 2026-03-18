@@ -12,9 +12,7 @@ public class BlockBreakModifier implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        // Detect MC version and select the right handler
         VersionHandlerRegistry.init();
-        // Load global config (used on dedicated servers and as default)
         BlockBreakConfig.loadGlobal();
         LOGGER.info("[BBM] BlockBreakModifier initialized.");
     }

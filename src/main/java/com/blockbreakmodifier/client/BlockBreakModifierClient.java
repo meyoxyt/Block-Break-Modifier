@@ -9,32 +9,35 @@ import net.fabricmc.api.Environment;
 @Environment(EnvType.CLIENT)
 public class BlockBreakModifierClient implements ClientModInitializer {
 
-    private static String currentWorldName = null;
+    private static String currentWorldId = null;
 
     @Override
     public void onInitializeClient() {
-        BlockBreakConfig.loadGlobal();
-        BlockBreakModifier.LOGGER.info("BlockBreakModifier client initialized.");
+        BlockBreakModifier.LOGGER.info("[BBM] Client initialized.");
     }
 
-    public static void onWorldJoin(String worldFolderName) {
-        currentWorldName = worldFolderName;
-        BlockBreakConfig.loadForWorld(worldFolderName);
+    public static void onWorldJoin() {
+        if (currentWorldId != null) {
+            BlockBreakConfig.loadForWorld(currentWorldId);
+        }
     }
 
     public static void onWorldLeave() {
-        currentWorldName = null;
+        currentWorldId = null;
         BlockBreakConfig.loadGlobal();
     }
 
-    public static void reloadForWorld(String worldFolderName) {
-        BlockBreakConfig.loadForWorld(worldFolderName);
-        BlockBreakModifier.LOGGER.info(
-                "BlockBreakModifier: in-game reload triggered for world '{}'.", worldFolderName
-        );
+    public static void setCurrentWorldId(String worldId) {
+        currentWorldId = worldId;
     }
 
-    public static String getCurrentWorldName() {
-        return currentWorldName;
+    public static void reloadForWorld(String worldId) {
+        currentWorldId = worldId;
+        BlockBreakConfig.loadForWorld(worldId);
+        BlockBreakModifier.LOGGER.info("[BBM] Reloaded config for world: {}", worldId);
+    }
+
+    public static String getCurrentWorldId() {
+        return currentWorldId;
     }
 }

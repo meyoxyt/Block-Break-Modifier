@@ -3,11 +3,11 @@ package com.blockbreakmodifier.mixin;
 import com.blockbreakmodifier.client.BlockBreakModifierClient;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.world.WorldListWidget;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.text.Text;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.worldselection.WorldSelectionList;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.storage.LevelSummary;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -19,49 +19,48 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Environment(EnvType.CLIENT)
-@Mixin(WorldListWidget.WorldEntry.class)
+@Mixin(WorldSelectionList.WorldListEntry.class)
 public abstract class WorldListEntryMixin {
 
-    @Shadow @Final LevelSummary level;
+    @Shadow @Final private LevelSummary summary;
 
     @Unique
-    private ButtonWidget blockbreakmodifier$reloadButton;
+    private Button blockbreakmodifier$reloadButton;
 
     @Inject(method = "render", at = @At("TAIL"))
     private void blockbreakmodifier$renderReloadButton(
-            DrawContext context,
+            GuiGraphics graphics,
             int index,
-            int y,
-            int x,
-            int entryWidth,
-            int entryHeight,
+            int top,
+            int left,
+            int width,
+            int height,
             int mouseX,
             int mouseY,
             boolean hovered,
-            float tickDelta,
+            float partialTick,
             CallbackInfo ci
     ) {
         if (!hovered) return;
-        String worldId = level.getName();
+        String worldId = summary.getLevelId();
         if (blockbreakmodifier$reloadButton == null) {
-            blockbreakmodifier$reloadButton = ButtonWidget.builder(
-                    Text.literal("\u21BB BBM"),
+            blockbreakmodifier$reloadButton = Button.builder(
+                    Component.literal("\u21BB BBM"),
                     btn -> {
                         BlockBreakModifierClient.reloadForWorld(worldId);
-                        MinecraftClient mc = MinecraftClient.getInstance();
+                        Minecraft mc = Minecraft.getInstance();
                         if (mc.player != null) {
-                            mc.player.sendMessage(
-                                    Text.literal("§a[BBM] §7Reloaded config for world: §e" + worldId),
-                                    false
+                            mc.player.sendSystemMessage(
+                                    Component.literal("§a[BBM] §7Reloaded config for world: §e" + worldId)
                             );
                         }
                     }
-            ).dimensions(x + entryWidth - 62, y + entryHeight - 20, 60, 18).build();
+            ).bounds(left + width - 62, top + height - 20, 60, 18).build();
         } else {
-            blockbreakmodifier$reloadButton.setX(x + entryWidth - 62);
-            blockbreakmodifier$reloadButton.setY(y + entryHeight - 20);
+            blockbreakmodifier$reloadButton.setX(left + width - 62);
+            blockbreakmodifier$reloadButton.setY(top + height - 20);
         }
-        blockbreakmodifier$reloadButton.render(context, mouseX, mouseY, tickDelta);
+        blockbreakmodifier$reloadButton.render(graphics, mouseX, mouseY, partialTick);
     }
 
     @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)

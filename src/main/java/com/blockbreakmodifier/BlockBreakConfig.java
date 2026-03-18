@@ -22,29 +22,25 @@ public class BlockBreakConfig {
         ensureGlobalConfig();
         activeEntries = parseFile(GLOBAL_CONFIG);
         BlockBreakModifier.LOGGER.info(
-                "BlockBreakModifier: loaded global config ({} override(s)).",
-                activeEntries.size()
-        );
+                "[BBM] Loaded global config ({} override(s)).", activeEntries.size());
     }
 
     public static void loadForWorld(String worldFolderName) {
         ensureGlobalConfig();
         Map<String, BlockEntry> global = parseFile(GLOBAL_CONFIG);
 
-        Path worldDir = CONFIG_ROOT.resolve(worldFolderName);
+        Path worldDir    = CONFIG_ROOT.resolve(worldFolderName);
         Path worldConfig = worldDir.resolve("blockbreakmodifier-config.yml");
         ensureWorldConfig(worldDir, worldConfig, worldFolderName);
 
-        Map<String, BlockEntry> world = parseFile(worldConfig);
-
+        Map<String, BlockEntry> world  = parseFile(worldConfig);
         Map<String, BlockEntry> merged = new HashMap<>(world);
         global.forEach(merged::put);
 
         activeEntries = merged;
         BlockBreakModifier.LOGGER.info(
-                "BlockBreakModifier: loaded config for '{}' - world={}, global={}, merged={}.",
-                worldFolderName, world.size(), global.size(), merged.size()
-        );
+                "[BBM] Loaded config for '{}' — world={}, global={}, merged={}.",
+                worldFolderName, world.size(), global.size(), merged.size());
     }
 
     private static Map<String, BlockEntry> parseFile(Path path) {
@@ -54,7 +50,7 @@ public class BlockBreakConfig {
             Map<String, Object> root = yaml.load(is);
             return parse(root);
         } catch (IOException e) {
-            BlockBreakModifier.LOGGER.error("BlockBreakModifier: failed to read config at {}.", path, e);
+            BlockBreakModifier.LOGGER.error("[BBM] Failed to read config at {}.", path, e);
             return new HashMap<>();
         }
     }
@@ -87,7 +83,8 @@ public class BlockBreakConfig {
 
     private static float toFloat(Object obj, float fallback) {
         if (obj instanceof Number n) return n.floatValue();
-        try { return Float.parseFloat(obj.toString()); } catch (Exception e) { return fallback; }
+        try { return Float.parseFloat(obj.toString()); }
+        catch (Exception e) { return fallback; }
     }
 
     private static void ensureGlobalConfig() {
@@ -98,9 +95,9 @@ public class BlockBreakConfig {
                         .getResourceAsStream("/blockbreakmodifier-config.yml")) {
                     if (src != null) Files.copy(src, GLOBAL_CONFIG);
                 }
-                BlockBreakModifier.LOGGER.info("BlockBreakModifier: created default global config.");
+                BlockBreakModifier.LOGGER.info("[BBM] Created default global config.");
             } catch (IOException e) {
-                BlockBreakModifier.LOGGER.error("BlockBreakModifier: failed to create global config.", e);
+                BlockBreakModifier.LOGGER.error("[BBM] Failed to create global config.", e);
             }
         }
     }
@@ -113,13 +110,9 @@ public class BlockBreakConfig {
                         .getResourceAsStream("/blockbreakmodifier-world-config.yml")) {
                     if (src != null) Files.copy(src, worldConfig);
                 }
-                BlockBreakModifier.LOGGER.info(
-                        "BlockBreakModifier: created default config for world '{}'.", worldName
-                );
+                BlockBreakModifier.LOGGER.info("[BBM] Created default config for world '{}'.", worldName);
             } catch (IOException e) {
-                BlockBreakModifier.LOGGER.error(
-                        "BlockBreakModifier: failed to create world config for '{}'.", worldName, e
-                );
+                BlockBreakModifier.LOGGER.error("[BBM] Failed to create world config for '{}'.", worldName, e);
             }
         }
     }

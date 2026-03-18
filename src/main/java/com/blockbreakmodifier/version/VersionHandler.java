@@ -1,57 +1,46 @@
 package com.blockbreakmodifier.version;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.state.BlockState;
 
 /**
- * Version-agnostic API surface.
- * Each supported MC version range has its own implementation.
- * All version-sensitive logic is routed through here.
+ * Version-agnostic API surface for BlockBreakModifier.
+ *
+ * Each supported MC version group has its own implementation.
+ * Mixins and core logic NEVER import version-specific classes directly —
+ * they always go through VersionHandlerRegistry.get().
+ *
+ * Adding support for a new version:
+ *  1. Create a new class extending the nearest base handler
+ *  2. Override only what changed
+ *  3. Register it in VersionHandlerRegistry
  */
 public interface VersionHandler {
 
-    /** Human-readable version label e.g. "1.21", "1.21.1", "1.21.4", "1.21.11" */
+    /** Human-readable label, e.g. "1.21", "1.21.4", "1.21.11+" */
     String getVersionLabel();
 
     /**
-     * Returns the block identifier string for a given BlockState.
-     * e.g. "minecraft:stone"
+     * Returns the block's registry ID string, e.g. "minecraft:obsidian".
+     * Uses MojangMappings method names which are stable across 1.21.x.
      */
-    default String getBlockId(BlockState state) {
-        Block block = state.getBlock();
-        Identifier id = Registries.BLOCK.getId(block);
-        return id.toString();
-    }
+    String getBlockId(BlockState state);
 
     /**
-     * Returns the tool identifier string for the player's main-hand item.
-     * Returns "minecraft:air" if hand is empty.
+     * Returns the player's main-hand item registry ID, e.g. "minecraft:diamond_pickaxe".
+     * Returns "minecraft:air" when hand is empty.
      */
-    default String getToolId(PlayerEntity player) {
-        ItemStack stack = player.getMainHandStack();
-        if (stack.isEmpty()) return "minecraft:air";
-        Identifier id = Registries.ITEM.getId(stack.getItem());
-        return id.toString();
-    }
+    String getToolId(Player player);
 
-    /**
-     * Returns true if this handler supports the given Minecraft protocol version.
-     * Protocol version is obtained from SharedConstants.
-     */
+    /** Returns true if this handler handles the given protocol version. */
     boolean supportsVersion(int protocolVersion);
 
-    /**
-     * Returns the minimum protocol version this handler supports (inclusive).
-     */
+    /** Lowest protocol version this handler covers (inclusive). */
     int minProtocolVersion();
 
     /**
-     * Returns the maximum protocol version this handler supports (inclusive).
-     * Use Integer.MAX_VALUE for open-ended (latest+).
+     * Highest protocol version this handler covers (inclusive).
+     * Use Integer.MAX_VALUE for open-ended (catch-all for future versions).
      */
     int maxProtocolVersion();
 }

@@ -2,18 +2,18 @@ package com.blockbreakmodifier.mixin;
 
 import com.blockbreakmodifier.BlockBreakConfig;
 import com.blockbreakmodifier.version.VersionHandlerRegistry;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(PlayerEntity.class)
+@Mixin(Player.class)
 public abstract class MiningSpeedMixin {
 
     @Inject(
-            method = "getBlockBreakingSpeed",
+            method = "getDestroySpeed",
             at = @At("RETURN"),
             cancellable = true
     )
@@ -22,7 +22,7 @@ public abstract class MiningSpeedMixin {
             CallbackInfoReturnable<Float> cir
     ) {
         if (!VersionHandlerRegistry.isInitialized()) return;
-        PlayerEntity self = (PlayerEntity) (Object) this;
+        Player self = (Player) (Object) this;
         String blockId = VersionHandlerRegistry.get().getBlockId(state);
         String toolId  = VersionHandlerRegistry.get().getToolId(self);
         BlockBreakConfig.getToolSpeed(blockId, toolId).ifPresent(cir::setReturnValue);

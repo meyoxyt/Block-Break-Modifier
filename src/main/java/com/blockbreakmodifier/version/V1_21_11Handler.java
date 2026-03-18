@@ -1,32 +1,14 @@
 package com.blockbreakmodifier.version;
 
 /**
- * Handler for Minecraft 1.21.11+ (protocol 771+).
- * This is the catch-all for all versions 1.21.11 and above.
- * As the "latest" handler it has an open-ended max protocol version.
+ * MC 1.21.11+ — Protocol 771+
+ * Open-ended catch-all: handles 1.21.11 and any future 1.21.x release.
+ * Since MojangMappings method names don't change within an era,
+ * this handler will work correctly for unknown future versions too.
  */
-public class V1_21_11Handler extends V1_21_1Handler {
+public class V1_21_11Handler extends BaseVersionHandler {
 
-    // 1.21.11 protocol = 771
-    private static final int PROTOCOL_MIN = 771;
-
-    @Override
-    public String getVersionLabel() {
-        return "1.21.11+";
-    }
-
-    @Override
-    public boolean supportsVersion(int protocolVersion) {
-        return protocolVersion >= PROTOCOL_MIN;
-    }
-
-    @Override
-    public int minProtocolVersion() {
-        return PROTOCOL_MIN;
-    }
-
-    @Override
-    public int maxProtocolVersion() {
-        return Integer.MAX_VALUE;
-    }
+    @Override public String getVersionLabel()    { return "1.21.11+"; }
+    @Override public int minProtocolVersion()    { return 771; }
+    @Override public int maxProtocolVersion()    { return Integer.MAX_VALUE; }
 }
