@@ -1,10 +1,9 @@
 package com.blockbreakmodifier.mixin;
 
 import com.blockbreakmodifier.BlockBreakConfig;
+import com.blockbreakmodifier.version.VersionHandlerRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.explosion.Explosion;
@@ -28,8 +27,8 @@ public abstract class BlastResistanceMixin {
             Explosion explosion,
             CallbackInfoReturnable<Float> cir
     ) {
-        Block block = state.getBlock();
-        Identifier blockId = Registries.BLOCK.getId(block);
-        BlockBreakConfig.getBlastResistance(blockId.toString()).ifPresent(cir::setReturnValue);
+        if (!VersionHandlerRegistry.isInitialized()) return;
+        String blockId = VersionHandlerRegistry.get().getBlockId(state);
+        BlockBreakConfig.getBlastResistance(blockId).ifPresent(cir::setReturnValue);
     }
 }

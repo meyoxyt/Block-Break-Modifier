@@ -27,10 +27,7 @@ public abstract class WorldListEntryMixin {
     @Unique
     private ButtonWidget blockbreakmodifier$reloadButton;
 
-    @Inject(
-            method = "render",
-            at = @At("TAIL")
-    )
+    @Inject(method = "render", at = @At("TAIL"))
     private void blockbreakmodifier$renderReloadButton(
             DrawContext context,
             int index,
@@ -45,9 +42,7 @@ public abstract class WorldListEntryMixin {
             CallbackInfo ci
     ) {
         if (!hovered) return;
-
         String worldId = level.getName();
-
         if (blockbreakmodifier$reloadButton == null) {
             blockbreakmodifier$reloadButton = ButtonWidget.builder(
                     Text.literal("\u21BB BBM"),
@@ -66,15 +61,10 @@ public abstract class WorldListEntryMixin {
             blockbreakmodifier$reloadButton.setX(x + entryWidth - 62);
             blockbreakmodifier$reloadButton.setY(y + entryHeight - 20);
         }
-
         blockbreakmodifier$reloadButton.render(context, mouseX, mouseY, tickDelta);
     }
 
-    @Inject(
-            method = "mouseClicked",
-            at = @At("HEAD"),
-            cancellable = true
-    )
+    @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
     private void blockbreakmodifier$handleReloadClick(
             double mouseX,
             double mouseY,

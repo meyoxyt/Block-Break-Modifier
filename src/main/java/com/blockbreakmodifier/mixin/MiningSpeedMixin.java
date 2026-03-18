@@ -1,11 +1,9 @@
 package com.blockbreakmodifier.mixin;
 
 import com.blockbreakmodifier.BlockBreakConfig;
+import com.blockbreakmodifier.version.VersionHandlerRegistry;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -23,15 +21,10 @@ public abstract class MiningSpeedMixin {
             BlockState state,
             CallbackInfoReturnable<Float> cir
     ) {
+        if (!VersionHandlerRegistry.isInitialized()) return;
         PlayerEntity self = (PlayerEntity) (Object) this;
-        Identifier blockId = Registries.BLOCK.getId(state.getBlock());
-
-        if (!BlockBreakConfig.hasBlockOverride(blockId.toString())) return;
-
-        ItemStack held = self.getMainHandStack();
-        Identifier toolId = Registries.ITEM.getId(held.getItem());
-
-        BlockBreakConfig.getToolSpeed(blockId.toString(), toolId.toString())
-                .ifPresent(cir::setReturnValue);
+        String blockId = VersionHandlerRegistry.get().getBlockId(state);
+        String toolId  = VersionHandlerRegistry.get().getToolId(self);
+        BlockBreakConfig.getToolSpeed(blockId, toolId).ifPresent(cir::setReturnValue);
     }
 }
