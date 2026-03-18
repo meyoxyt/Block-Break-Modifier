@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/Minecraft-1.21.11-brightgreen?style=for-the-badge&logo=minecraft" alt="Minecraft 1.21.11"/>
+  <img src="https://img.shields.io/badge/Minecraft-1.21.1-brightgreen?style=for-the-badge&logo=minecraft" alt="Minecraft 1.21.1"/>
   <img src="https://img.shields.io/badge/Loader-Fabric-blue?style=for-the-badge" alt="Fabric"/>
   <img src="https://img.shields.io/badge/Version-1.0.0-orange?style=for-the-badge" alt="v1.0.0"/>
   <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" alt="MIT License"/>
@@ -9,7 +9,7 @@
 <h1 align="center">🔨 BlockBreakModifier</h1>
 
 <p align="center">
-  A fully customizable <strong>Fabric mod</strong> for Minecraft <strong>1.21.11</strong> that lets you override
+  A fully customizable <strong>Fabric mod</strong> for Minecraft <strong>1.21.1</strong> that lets you override
   <em>which tools</em> break any block, <em>how fast</em>, and <em>blast resistance</em> —
   all through YAML config files with <strong>per-world configs</strong>, a <strong>global config</strong>,
   and an <strong>in-game reload button</strong>. No restart ever needed.
@@ -34,8 +34,8 @@
 
 ## 📦 Installation
 
-1. Install [Fabric Loader 0.18.1+](https://fabricmc.net/use/) for Minecraft **1.21.11**
-2. Install [Fabric API 0.141.3+1.21.11](https://modrinth.com/mod/fabric-api)
+1. Install [Fabric Loader 0.18.1+](https://fabricmc.net/use/) for Minecraft **1.21.1**
+2. Install [Fabric API 0.102.0+1.21.1](https://modrinth.com/mod/fabric-api)
 3. Drop `blockbreakmodifier-1.0.0.jar` into your `mods/` folder
 4. Launch the game — configs are auto-created:
    ```
@@ -230,7 +230,7 @@ Block-Break-Modifier/
 ```bash
 git clone https://github.com/meyoxyt/Block-Break-Modifier.git
 cd "Block-Break-Modifier"
-./gradlew build
+./gradlew clean build
 ```
 
 Output: `build/libs/blockbreakmodifier-1.0.0.jar`
