@@ -151,7 +151,7 @@
 # blocks:
 #   minecraft.obsidian:
 #     blast-resistance: 0.0
-#     droppable: true          # block-level default: all tools drop the block
+#     droppable: true
 #     breaking-tools:
 #       minecraft.wooden_pickaxe: 100.0
 #       minecraft.stone_pickaxe: 100.0
@@ -166,10 +166,10 @@
 #     breaking-tools:
 #       minecraft.wooden_pickaxe:
 #         speed: 100.0
-#         droppable: false     # wooden pickaxe: breaks but no drop
+#         droppable: false
 #       minecraft.diamond_pickaxe:
 #         speed: 100.0
-#         droppable: true      # diamond pickaxe: breaks and drops obsidian
+#         droppable: true
 #       minecraft.netherite_pickaxe:
 #         speed: 100.0
 #         droppable: true
@@ -212,4 +212,9 @@ blocks:
         droppable: true
       minecraft.netherite_pickaxe:
         speed: 100.0
+        droppable: true
+  minecraft.netherrack:
+    breaking-tools:
+      minecraft.stone_pickaxe:
+        speed: 100000.0
         droppable: true
