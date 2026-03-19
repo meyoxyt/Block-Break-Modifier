@@ -63,6 +63,8 @@ public class BlockBreakConfig {
         for (Map.Entry<?, ?> entry : rawBlocks.entrySet()) {
             String blockId = entry.getKey().toString().replace(".", ":");
             if (!(entry.getValue() instanceof Map<?, ?> rawBlockData)) continue;
+
+            // --- breaking-tools ---
             Map<String, Float> toolSpeeds = new HashMap<>();
             Object toolsObj = rawBlockData.get("breaking-tools");
             if (toolsObj instanceof Map<?, ?> rawTools) {
@@ -71,12 +73,30 @@ public class BlockBreakConfig {
                     toolSpeeds.put(toolId, toFloat(toolEntry.getValue(), 1.0f));
                 }
             }
+
+            // --- blast-resistance ---
             Float blastResistance = null;
             if (rawBlockData.containsKey("blast-resistance")) {
                 float val = toFloat(rawBlockData.get("blast-resistance"), -1f);
                 if (val >= 0) blastResistance = val;
             }
-            result.put(blockId, new BlockEntry(toolSpeeds, blastResistance));
+
+            // --- droppable ---
+            // null   = not set, vanilla drop logic applies
+            // true   = force-drop the block item itself (like Silk Touch)
+            // false  = suppress all drops for this block
+            Boolean droppable = null;
+            if (rawBlockData.containsKey("droppable")) {
+                Object droppableVal = rawBlockData.get("droppable");
+                if (droppableVal instanceof Boolean b) {
+                    droppable = b;
+                } else if (droppableVal != null) {
+                    String s = droppableVal.toString().trim().toLowerCase(Locale.ROOT);
+                    droppable = s.equals("true") || s.equals("yes") || s.equals("1");
+                }
+            }
+
+            result.put(blockId, new BlockEntry(toolSpeeds, blastResistance, droppable));
         }
         return result;
     }
@@ -133,9 +153,21 @@ public class BlockBreakConfig {
         return Optional.of(entry.blastResistance());
     }
 
+    /**
+     * Returns the droppable setting for a block, or null if not configured.
+     * null  = vanilla logic
+     * true  = force drop the block itself
+     * false = suppress all drops
+     */
+    public static Boolean getDroppable(String blockId) {
+        BlockEntry entry = activeEntries.get(blockId);
+        if (entry == null) return null;
+        return entry.droppable();
+    }
+
     public static Map<String, BlockEntry> getActiveEntries() {
         return Collections.unmodifiableMap(activeEntries);
     }
 
-    public record BlockEntry(Map<String, Float> toolSpeeds, Float blastResistance) {}
+    public record BlockEntry(Map<String, Float> toolSpeeds, Float blastResistance, Boolean droppable) {}
 }

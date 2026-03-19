@@ -40,6 +40,7 @@
 #  STEP 3 - Add it under the "blocks:" section with your settings.
 #    Each block entry supports:
 #      blast-resistance: <float>         (optional - leave out to keep vanilla)
+#      droppable: <true/false>           (optional - controls item drops)
 #      breaking-tools:
 #        <tool_id>: <speed>              (one line per tool)
 #
@@ -86,6 +87,25 @@
 #  Set to 0.0 to make a block fully destroyable by TNT.
 #
 # =============================================================================
+#  DROPPABLE GUIDE
+# =============================================================================
+#
+#  Controls whether a block drops an item when broken.
+#  This field is OPTIONAL per block. Leave it out to use vanilla drop logic.
+#
+#  droppable: true
+#    Forces the block ITSELF to drop as an item, regardless of tool or
+#    enchantments. Useful for blocks that normally drop a different item
+#    (e.g. stone drops cobblestone by default — set droppable: true to
+#    force a stone item drop instead, like Silk Touch).
+#
+#  droppable: false
+#    Completely suppresses all drops for this block. Nothing drops.
+#
+#  (not set)
+#    Vanilla loot table logic runs normally. This is the default.
+#
+# =============================================================================
 #  TOOL ID REFERENCE
 # =============================================================================
 #
@@ -111,6 +131,7 @@
 #  blocks:
 #    <namespace>.<block_name>:
 #      blast-resistance: <float>             # optional
+#      droppable: <true/false>               # optional
 #      breaking-tools:
 #        <namespace>.<tool_name>: <speed>    # one line per tool
 #
@@ -118,51 +139,69 @@
 #  EXAMPLES (all commented out - uncomment and edit to activate)
 # =============================================================================
 #
-# --- Example 1: Obsidian with wooden pickaxe, near-instant, TNT-destroyable ---
+# --- Example 1: Stone breaks instantly with stone pickaxe, TNT-destroyable, drops itself ---
+# blocks:
+#   minecraft.stone:
+#     blast-resistance: 0.0
+#     droppable: true
+#     breaking-tools:
+#       minecraft.stone_pickaxe: 100.0
+#       minecraft.iron_pickaxe: 100.0
+#       minecraft.diamond_pickaxe: 100.0
+#
+# --- Example 2: Obsidian with wooden pickaxe, near-instant, TNT-destroyable ---
 # blocks:
 #   minecraft.obsidian:
 #     blast-resistance: 10.0
+#     droppable: true
 #     breaking-tools:
 #       minecraft.wooden_pickaxe: 50.0
 #       minecraft.stone_pickaxe: 80.0
 #       minecraft.iron_pickaxe: 100.0
 #
-# --- Example 2: Ancient Debris with golden pickaxe ---
+# --- Example 3: Ancient Debris with golden pickaxe ---
 # blocks:
 #   minecraft.ancient_debris:
+#     droppable: true
 #     breaking-tools:
 #       minecraft.golden_pickaxe: 60.0
 #
-# --- Example 3: Stone breakable with bare hands ---
+# --- Example 4: Stone breakable with bare hands (no drops) ---
 #   (minecraft.air = no item held)
 # blocks:
 #   minecraft.stone:
+#     droppable: false
 #     breaking-tools:
 #       minecraft.air: 5.0
 #
-# --- Example 4: Multiple blocks configured at once ---
+# --- Example 5: Multiple blocks configured at once ---
 # blocks:
 #   minecraft.obsidian:
 #     blast-resistance: 10.0
+#     droppable: true
 #     breaking-tools:
 #       minecraft.wooden_pickaxe: 50.0
 #       minecraft.iron_pickaxe: 100.0
 #   minecraft.crying_obsidian:
 #     blast-resistance: 10.0
+#     droppable: true
 #     breaking-tools:
 #       minecraft.wooden_pickaxe: 50.0
 #   minecraft.diamond_ore:
+#     droppable: true
 #     breaking-tools:
 #       minecraft.wooden_pickaxe: 30.0
 #   minecraft.netherrack:
 #     blast-resistance: 0.0
+#     droppable: false
 #     breaking-tools:
 #       minecraft.wooden_shovel: 10.0
 #
-# --- Example 5: Custom modded block ---
+# --- Example 6: Custom modded block ---
 # blocks:
 #   somemod.custom_block:
 #     blast-resistance: 5.0
+#     droppable: true
 #     breaking-tools:
 #       minecraft.golden_pickaxe: 20.0
 #       minecraft.wooden_axe: 15.0
@@ -170,3 +209,11 @@
 # =============================================================================
 
 blocks:
+  minecraft.stone:
+    blast-resistance: 0.0
+    droppable: true
+    breaking-tools:
+      minecraft.stone_pickaxe: 100.0
+      minecraft.iron_pickaxe: 100.0
+      minecraft.diamond_pickaxe: 100.0
+      minecraft.netherite_pickaxe: 100.0

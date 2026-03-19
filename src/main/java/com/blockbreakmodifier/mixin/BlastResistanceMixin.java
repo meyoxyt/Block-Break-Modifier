@@ -5,14 +5,21 @@ import com.blockbreakmodifier.version.VersionHandlerRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Block;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(Block.class)
+/**
+ * Overrides explosion/blast resistance per-block as configured.
+ *
+ * Targets BlockBehaviour.getExplosionResistance which is the actual
+ * implementation called by Block in 1.21.x. Block extends BlockBehaviour,
+ * so this fires for all blocks including vanilla ones.
+ */
+@Mixin(targets = "net.minecraft.world.level.block.state.BlockBehaviour", priority = 1100)
 public abstract class BlastResistanceMixin {
 
     @Inject(

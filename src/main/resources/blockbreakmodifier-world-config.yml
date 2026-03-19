@@ -28,20 +28,34 @@
 #
 #  Breaking speed: higher = faster. 8.0 = diamond pickaxe on stone. 100.0 = instant.
 #  Blast resistance: optional. 1200.0 = vanilla obsidian. 0.0 = TNT-destroyable.
+#  Droppable: optional.
+#    true  = force-drop the block item itself (like Silk Touch)
+#    false = suppress all drops
+#    (not set) = vanilla drop logic
 #
 # =============================================================================
 #  EXAMPLES (uncomment to activate)
 # =============================================================================
 #
 # blocks:
+#   minecraft.stone:
+#     blast-resistance: 0.0
+#     droppable: true
+#     breaking-tools:
+#       minecraft.stone_pickaxe: 100.0
+#       minecraft.iron_pickaxe: 100.0
+#
+# blocks:
 #   minecraft.obsidian:
 #     blast-resistance: 10.0
+#     droppable: true
 #     breaking-tools:
 #       minecraft.wooden_pickaxe: 50.0
 #       minecraft.iron_pickaxe: 100.0
 #
 # blocks:
 #   minecraft.ancient_debris:
+#     droppable: true
 #     breaking-tools:
 #       minecraft.golden_pickaxe: 60.0
 #
