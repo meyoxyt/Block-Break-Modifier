@@ -1,5 +1,6 @@
 package com.blockbreakmodifier;
 
+import com.blockbreakmodifier.command.ReloadCommand;
 import com.blockbreakmodifier.version.VersionHandlerRegistry;
 import net.fabricmc.api.ModInitializer;
 import org.slf4j.Logger;
@@ -14,6 +15,7 @@ public class BlockBreakModifier implements ModInitializer {
     public void onInitialize() {
         VersionHandlerRegistry.init();
         BlockBreakConfig.loadGlobal();
+        ReloadCommand.register();
         LOGGER.info("[BBM] BlockBreakModifier initialized.");
     }
 }
