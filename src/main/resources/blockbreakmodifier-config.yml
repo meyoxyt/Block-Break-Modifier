@@ -149,24 +149,14 @@
 #       minecraft.iron_pickaxe: 100.0
 #       minecraft.diamond_pickaxe: 100.0
 #
-# --- Example 2: Obsidian with wooden pickaxe, near-instant, TNT-destroyable ---
-# blocks:
-#   minecraft.obsidian:
-#     blast-resistance: 10.0
-#     droppable: true
-#     breaking-tools:
-#       minecraft.wooden_pickaxe: 50.0
-#       minecraft.stone_pickaxe: 80.0
-#       minecraft.iron_pickaxe: 100.0
-#
-# --- Example 3: Ancient Debris with golden pickaxe ---
+# --- Example 2: Ancient Debris with golden pickaxe ---
 # blocks:
 #   minecraft.ancient_debris:
 #     droppable: true
 #     breaking-tools:
 #       minecraft.golden_pickaxe: 60.0
 #
-# --- Example 4: Stone breakable with bare hands (no drops) ---
+# --- Example 3: Block breakable with bare hands (no drops) ---
 #   (minecraft.air = no item held)
 # blocks:
 #   minecraft.stone:
@@ -174,19 +164,13 @@
 #     breaking-tools:
 #       minecraft.air: 5.0
 #
-# --- Example 5: Multiple blocks configured at once ---
+# --- Example 4: Multiple blocks configured at once ---
 # blocks:
-#   minecraft.obsidian:
-#     blast-resistance: 10.0
-#     droppable: true
-#     breaking-tools:
-#       minecraft.wooden_pickaxe: 50.0
-#       minecraft.iron_pickaxe: 100.0
 #   minecraft.crying_obsidian:
-#     blast-resistance: 10.0
+#     blast-resistance: 0.0
 #     droppable: true
 #     breaking-tools:
-#       minecraft.wooden_pickaxe: 50.0
+#       minecraft.wooden_pickaxe: 100.0
 #   minecraft.diamond_ore:
 #     droppable: true
 #     breaking-tools:
@@ -197,7 +181,7 @@
 #     breaking-tools:
 #       minecraft.wooden_shovel: 10.0
 #
-# --- Example 6: Custom modded block ---
+# --- Example 5: Custom modded block ---
 # blocks:
 #   somemod.custom_block:
 #     blast-resistance: 5.0
@@ -209,11 +193,13 @@
 # =============================================================================
 
 blocks:
-  minecraft.stone:
+  minecraft.obsidian:
     blast-resistance: 0.0
     droppable: true
     breaking-tools:
+      minecraft.wooden_pickaxe: 100.0
       minecraft.stone_pickaxe: 100.0
       minecraft.iron_pickaxe: 100.0
+      minecraft.golden_pickaxe: 100.0
       minecraft.diamond_pickaxe: 100.0
       minecraft.netherite_pickaxe: 100.0
