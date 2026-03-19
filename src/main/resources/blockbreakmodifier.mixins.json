@@ -3,9 +3,9 @@
   "package": "com.blockbreakmodifier.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "MiningSpeedMixin",
     "BlastResistanceMixin",
-    "BlockDropMixin"
+    "BlockDropMixin",
+    "MiningSpeedMixin"
   ],
   "injectors": {
     "defaultRequire": 0

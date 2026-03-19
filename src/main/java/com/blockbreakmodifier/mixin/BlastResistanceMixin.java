@@ -8,19 +8,25 @@ import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
- * Targets BlockBehaviour.BlockStateBase — the actual non-final superclass
- * of all BlockState objects in 1.21.x. BlockState itself is a generated
- * final class and cannot be mixined directly.
+ * CRITICAL: Must use value = BlockBehaviour.BlockStateBase.class (class reference),
+ * NOT targets = "..." (string). String-based targets bypass Loom's remapper
+ * so Mojang-mapped method names like "getExplosionResistance" never resolve
+ * at runtime against the intermediary/obfuscated jar.
  *
- * BlockStateBase.getExplosionResistance() is the method called by
- * Explosion when evaluating whether each block gets destroyed.
+ * Using the class reference ensures Loom rewrites the method descriptor to
+ * intermediary at compile time, which then resolves correctly at runtime.
+ *
+ * @Pseudo is required because BlockStateBase is a protected inner class —
+ * without it Mixin refuses to apply to non-public inner classes.
  */
-@Mixin(targets = "net.minecraft.world.level.block.state.BlockBehaviour$BlockStateBase", priority = 1100)
+@Pseudo
+@Mixin(value = BlockBehaviour.BlockStateBase.class, priority = 1100)
 public abstract class BlastResistanceMixin {
 
     @Inject(
@@ -29,14 +35,13 @@ public abstract class BlastResistanceMixin {
             cancellable = true,
             require = 0
     )
-    private void blockbreakmodifier$overrideBlastResistance(
+    private void bbm$overrideBlastResistance(
             BlockGetter world,
             BlockPos pos,
             Explosion explosion,
             CallbackInfoReturnable<Float> cir
     ) {
         if (!VersionHandlerRegistry.isInitialized()) return;
-        // "this" is a BlockStateBase which IS a BlockState at runtime
         BlockState self = (BlockState) (Object) this;
         String blockId = VersionHandlerRegistry.get().getBlockId(self);
         BlockBreakConfig.getBlastResistance(blockId).ifPresent(cir::setReturnValue);
