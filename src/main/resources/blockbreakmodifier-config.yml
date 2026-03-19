@@ -192,29 +192,3 @@
 # =============================================================================
 
 blocks:
-  minecraft.obsidian:
-    blast-resistance: 0.0
-    breaking-tools:
-      minecraft.wooden_pickaxe:
-        speed: 100.0
-        droppable: true
-      minecraft.stone_pickaxe:
-        speed: 100.0
-        droppable: true
-      minecraft.iron_pickaxe:
-        speed: 100.0
-        droppable: true
-      minecraft.golden_pickaxe:
-        speed: 100.0
-        droppable: true
-      minecraft.diamond_pickaxe:
-        speed: 100.0
-        droppable: true
-      minecraft.netherite_pickaxe:
-        speed: 100.0
-        droppable: true
-  minecraft.netherrack:
-    breaking-tools:
-      minecraft.stone_pickaxe:
-        speed: 100000.0
-        droppable: true
