@@ -3,8 +3,9 @@ package com.blockbreakmodifier.mixin;
 import com.blockbreakmodifier.BlockBreakConfig;
 import com.blockbreakmodifier.version.VersionHandlerRegistry;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Explosion;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -12,14 +13,14 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
- * Overrides blast resistance by targeting BlockState.getExplosionResistance.
+ * Targets BlockBehaviour.BlockStateBase — the actual non-final superclass
+ * of all BlockState objects in 1.21.x. BlockState itself is a generated
+ * final class and cannot be mixined directly.
  *
- * In 1.21.x the Explosion class calls blockState.getExplosionResistance(...)
- * on every block it checks. Targeting BlockState directly is the most reliable
- * approach — it works regardless of which Block subclass is involved and
- * avoids the intermediate descriptor issues with BlockBehaviour.
+ * BlockStateBase.getExplosionResistance() is the method called by
+ * Explosion when evaluating whether each block gets destroyed.
  */
-@Mixin(value = BlockState.class, priority = 1100)
+@Mixin(targets = "net.minecraft.world.level.block.state.BlockBehaviour$BlockStateBase", priority = 1100)
 public abstract class BlastResistanceMixin {
 
     @Inject(
@@ -35,7 +36,8 @@ public abstract class BlastResistanceMixin {
             CallbackInfoReturnable<Float> cir
     ) {
         if (!VersionHandlerRegistry.isInitialized()) return;
-        BlockState self = (BlockState)(Object) this;
+        // "this" is a BlockStateBase which IS a BlockState at runtime
+        BlockState self = (BlockState) (Object) this;
         String blockId = VersionHandlerRegistry.get().getBlockId(self);
         BlockBreakConfig.getBlastResistance(blockId).ifPresent(cir::setReturnValue);
     }
