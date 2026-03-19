@@ -6,37 +6,37 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.Block;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
- * Overrides explosion/blast resistance per-block as configured.
+ * Overrides blast resistance by targeting BlockState.getExplosionResistance.
  *
- * Targets BlockBehaviour.getExplosionResistance which is the actual
- * implementation called by Block in 1.21.x. Block extends BlockBehaviour,
- * so this fires for all blocks including vanilla ones.
+ * In 1.21.x the Explosion class calls blockState.getExplosionResistance(...)
+ * on every block it checks. Targeting BlockState directly is the most reliable
+ * approach — it works regardless of which Block subclass is involved and
+ * avoids the intermediate descriptor issues with BlockBehaviour.
  */
-@Mixin(targets = "net.minecraft.world.level.block.state.BlockBehaviour", priority = 1100)
+@Mixin(value = BlockState.class, priority = 1100)
 public abstract class BlastResistanceMixin {
 
     @Inject(
-            method = "getExplosionResistance(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/Explosion;)F",
+            method = "getExplosionResistance",
             at = @At("RETURN"),
             cancellable = true,
             require = 0
     )
     private void blockbreakmodifier$overrideBlastResistance(
-            BlockState state,
             BlockGetter world,
             BlockPos pos,
             Explosion explosion,
             CallbackInfoReturnable<Float> cir
     ) {
         if (!VersionHandlerRegistry.isInitialized()) return;
-        String blockId = VersionHandlerRegistry.get().getBlockId(state);
+        BlockState self = (BlockState)(Object) this;
+        String blockId = VersionHandlerRegistry.get().getBlockId(self);
         BlockBreakConfig.getBlastResistance(blockId).ifPresent(cir::setReturnValue);
     }
 }

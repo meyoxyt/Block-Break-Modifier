@@ -43,6 +43,10 @@ public class BlockBreakConfig {
                 worldFolderName, world.size(), global.size(), merged.size());
     }
 
+    // -------------------------------------------------------------------------
+    // Parsing
+    // -------------------------------------------------------------------------
+
     private static Map<String, BlockEntry> parseFile(Path path) {
         if (!Files.exists(path)) return new HashMap<>();
         try (InputStream is = Files.newInputStream(path)) {
@@ -55,48 +59,65 @@ public class BlockBreakConfig {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private static Map<String, BlockEntry> parse(Map<String, Object> root) {
         Map<String, BlockEntry> result = new HashMap<>();
         if (root == null) return result;
         Object blocksObj = root.get("blocks");
         if (!(blocksObj instanceof Map<?, ?> rawBlocks)) return result;
+
         for (Map.Entry<?, ?> entry : rawBlocks.entrySet()) {
             String blockId = entry.getKey().toString().replace(".", ":");
             if (!(entry.getValue() instanceof Map<?, ?> rawBlockData)) continue;
 
-            // --- breaking-tools ---
-            Map<String, Float> toolSpeeds = new HashMap<>();
-            Object toolsObj = rawBlockData.get("breaking-tools");
-            if (toolsObj instanceof Map<?, ?> rawTools) {
-                for (Map.Entry<?, ?> toolEntry : rawTools.entrySet()) {
-                    String toolId = toolEntry.getKey().toString().replace(".", ":");
-                    toolSpeeds.put(toolId, toFloat(toolEntry.getValue(), 1.0f));
-                }
-            }
-
-            // --- blast-resistance ---
+            // --- blast-resistance (block level) ---
             Float blastResistance = null;
             if (rawBlockData.containsKey("blast-resistance")) {
                 float val = toFloat(rawBlockData.get("blast-resistance"), -1f);
                 if (val >= 0) blastResistance = val;
             }
 
-            // --- droppable ---
-            // null   = not set, vanilla drop logic applies
-            // true   = force-drop the block item itself (like Silk Touch)
-            // false  = suppress all drops for this block
-            Boolean droppable = null;
+            // --- block-level droppable default ---
+            // Used as fallback when a tool entry doesn't specify its own droppable.
+            Boolean blockDropDefault = null;
             if (rawBlockData.containsKey("droppable")) {
-                Object droppableVal = rawBlockData.get("droppable");
-                if (droppableVal instanceof Boolean b) {
-                    droppable = b;
-                } else if (droppableVal != null) {
-                    String s = droppableVal.toString().trim().toLowerCase(Locale.ROOT);
-                    droppable = s.equals("true") || s.equals("yes") || s.equals("1");
+                blockDropDefault = parseBool(rawBlockData.get("droppable"));
+            }
+
+            // --- breaking-tools ---
+            // Each tool entry can be:
+            //   simple:  minecraft.iron_pickaxe: 100.0
+            //   map:     minecraft.iron_pickaxe:
+            //              speed: 100.0
+            //              droppable: true
+            Map<String, Float>   toolSpeeds    = new HashMap<>();
+            Map<String, Boolean> toolDroppable = new HashMap<>();
+
+            Object toolsObj = rawBlockData.get("breaking-tools");
+            if (toolsObj instanceof Map<?, ?> rawTools) {
+                for (Map.Entry<?, ?> toolEntry : rawTools.entrySet()) {
+                    String toolId = toolEntry.getKey().toString().replace(".", ":");
+                    Object toolVal = toolEntry.getValue();
+
+                    if (toolVal instanceof Map<?, ?> toolMap) {
+                        // Extended syntax: speed + optional droppable per tool
+                        if (toolMap.containsKey("speed")) {
+                            toolSpeeds.put(toolId, toFloat(toolMap.get("speed"), 1.0f));
+                        }
+                        if (toolMap.containsKey("droppable")) {
+                            Boolean d = parseBool(toolMap.get("droppable"));
+                            if (d != null) toolDroppable.put(toolId, d);
+                        }
+                    } else {
+                        // Simple syntax: just a speed number
+                        toolSpeeds.put(toolId, toFloat(toolVal, 1.0f));
+                        // Inherit block-level droppable default if set
+                        if (blockDropDefault != null) toolDroppable.put(toolId, blockDropDefault);
+                    }
                 }
             }
 
-            result.put(blockId, new BlockEntry(toolSpeeds, blastResistance, droppable));
+            result.put(blockId, new BlockEntry(toolSpeeds, blastResistance, toolDroppable, blockDropDefault));
         }
         return result;
     }
@@ -106,6 +127,19 @@ public class BlockBreakConfig {
         try { return Float.parseFloat(obj.toString()); }
         catch (Exception e) { return fallback; }
     }
+
+    private static Boolean parseBool(Object obj) {
+        if (obj == null) return null;
+        if (obj instanceof Boolean b) return b;
+        String s = obj.toString().trim().toLowerCase(Locale.ROOT);
+        if (s.equals("true") || s.equals("yes") || s.equals("1")) return true;
+        if (s.equals("false") || s.equals("no") || s.equals("0")) return false;
+        return null;
+    }
+
+    // -------------------------------------------------------------------------
+    // File bootstrap helpers
+    // -------------------------------------------------------------------------
 
     private static void ensureGlobalConfig() {
         if (!Files.exists(GLOBAL_CONFIG)) {
@@ -137,6 +171,10 @@ public class BlockBreakConfig {
         }
     }
 
+    // -------------------------------------------------------------------------
+    // Public API
+    // -------------------------------------------------------------------------
+
     public static Optional<Float> getToolSpeed(String blockId, String toolId) {
         BlockEntry entry = activeEntries.get(blockId);
         if (entry == null) return Optional.empty();
@@ -154,20 +192,34 @@ public class BlockBreakConfig {
     }
 
     /**
-     * Returns the droppable setting for a block, or null if not configured.
-     * null  = vanilla logic
-     * true  = force drop the block itself
-     * false = suppress all drops
+     * Returns the droppable override for a specific block+tool combination.
+     * Lookup order:
+     *   1. Per-tool droppable set in extended syntax
+     *   2. Block-level droppable default
+     *   3. null = vanilla drop logic
      */
-    public static Boolean getDroppable(String blockId) {
+    public static Boolean getToolDroppable(String blockId, String toolId) {
         BlockEntry entry = activeEntries.get(blockId);
         if (entry == null) return null;
-        return entry.droppable();
+        Boolean perTool = entry.toolDroppable().get(toolId);
+        if (perTool != null) return perTool;
+        return entry.blockDropDefault(); // may be null = vanilla
     }
 
     public static Map<String, BlockEntry> getActiveEntries() {
         return Collections.unmodifiableMap(activeEntries);
     }
 
-    public record BlockEntry(Map<String, Float> toolSpeeds, Float blastResistance, Boolean droppable) {}
+    /**
+     * @param toolSpeeds      map of toolId -> break speed
+     * @param blastResistance override blast resistance, null = vanilla
+     * @param toolDroppable   per-tool droppable overrides
+     * @param blockDropDefault block-level droppable fallback, null = vanilla
+     */
+    public record BlockEntry(
+            Map<String, Float>   toolSpeeds,
+            Float                blastResistance,
+            Map<String, Boolean> toolDroppable,
+            Boolean              blockDropDefault
+    ) {}
 }
