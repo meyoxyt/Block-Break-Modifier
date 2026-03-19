@@ -24,15 +24,12 @@ public abstract class SelectWorldScreenMixin extends Screen {
 
     @Inject(method = "init", at = @At("TAIL"))
     private void blockbreakmodifier$addReloadButton(CallbackInfo ci) {
-        SelectWorldScreen self = (SelectWorldScreen) (Object) this;
-
         int btnWidth  = 110;
         int btnHeight = 20;
-        // Top-right corner: 4px padding from right edge, 4px from top
-        int btnX = self.width - btnWidth - 4;
+        int btnX = this.width - btnWidth - 4;
         int btnY = 4;
 
-        self.addRenderableWidget(
+        this.addRenderableWidget(
             Button.builder(
                 Component.literal("\u21ba BBM Reload"),
                 btn -> {
